@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无人机组装实训 - 无人机学科</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
+        .back-button {
+            position: absolute; top: 20px; left: 20px;
+            background: linear-gradient(145deg, #64b5f6, #42a5f5);
+            color: white; border: none; padding: 10px 20px; border-radius: 8px;
+            cursor: pointer; font-size: 14px; font-weight: 600;
+            transition: all 0.3s; z-index: 100;
+        }
+        .back-button:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(100, 181, 246, 0.4); }
+        header {
+            text-align: center; margin-bottom: 30px; padding: 40px 20px;
+            background: linear-gradient(145deg, #42a5f5, #64b5f6); color: white;
+            border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        h1 { margin-top: 0; font-size: 2.5em; color: #ffffff; }
+        .subtitle { font-size: 1.2em; opacity: 0.9; margin-top: 10px; }
+        .drone-type-selection {
+            background: rgba(255, 255, 255, 0.95); border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); border: 2px solid #64b5f6;
+            padding: 40px; margin-bottom: 30px;
+        }
+        .section-title { text-align: center; color: #42a5f5; margin-bottom: 30px; font-size: 1.8em; }
+        .section-subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        .drone-type-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;
+        }
+        .drone-type-card {
+            background: linear-gradient(145deg, #f8f9fa, #e3f2fd); border-radius: 12px;
+            padding: 25px; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: 3px solid transparent; position: relative; overflow: hidden;
+        }
+        .drone-type-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, #64b5f6, #42a5f5);
+        }
+        .drone-type-card:hover {
+            transform: translateY(-8px); box-shadow: 0 15px 35px rgba(100, 181, 246, 0.2);
+            border-color: #64b5f6;
+        }
+        .drone-type-card.selected { border-color: #66bb6a; background: linear-gradient(145deg, #e8f5e9, #c8e6c9); }
+        .drone-type-header { display: flex; align-items: center; margin-bottom: 15px; }
+        .drone-type-icon {
+            width: 80px; height: 80px; background: linear-gradient(145deg, #64b5f6, #42a5f5);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5em; margin-right: 15px;
+        }
+        .drone-type-info h3 { color: #42a5f5; font-size: 1.4em; margin-bottom: 5px; }
+        .drone-type-info p { color: #666; font-size: 0.9em; }
+        .drone-specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
+        .spec-item { background: white; padding: 10px; border-radius: 8px; display: flex; align-items: center; }
+        .spec-icon { font-size: 1.2em; margin-right: 8px; }
+        .spec-text { font-size: 0.85em; color: #333; }
+        .assembly-training {
+            background: rgba(255, 255, 255, 0.95); border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); border: 2px solid #42a5f5;
+            padding: 40px; display: none;
+        }
+        .training-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #e3f2fd;
+        }
+        .training-title { color: #42a5f5; font-size: 1.8em; }
+        .training-controls { display: flex; gap: 15px; }
+        .control-btn {
+            background: linear-gradient(145deg, #42a5f5, #64b5f6); color: white;
+            border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;
+            font-size: 14px; font-weight: 600; transition: all 0.3s;
+        }
+        .control-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(100, 181, 246, 0.3); }
+        .control-btn.primary { background: linear-gradient(145deg, #66bb6a, #81c784); }
+        .control-btn.danger { background: linear-gradient(145deg, #ef5350, #e57373); }
+        .assembly-steps-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .step-btn {
+            background: #e3f2fd; color: #42a5f5; border: none; padding: 12px 20px;
+            border-radius: 25px; cursor: pointer; font-size: 14px; font-weight: 600;
+            transition: all 0.4s; display: flex; align-items: center; gap: 8px;
+        }
+        .step-btn:hover { background: #bbdefb; transform: translateY(-2px); }
+        .step-btn.active { background: linear-gradient(145deg, #64b5f6, #42a5f5); color: white; transform: scale(1.05); }
+        .step-btn.completed { background: linear-gradient(145deg, #66bb6a, #81c784); color: white; }
+        .step-number {
+            width: 24px; height: 24px; background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;
+        }
+        .assembly-workspace { display: flex; gap: 30px; flex-wrap: wrap; }
+        .parts-selection {
+            flex: 1; min-width: 350px; background: #f8f9fa; border-radius: 12px;
+            padding: 25px; border: 2px solid #e3f2fd;
+        }
+        .parts-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e3f2fd; }
+        .parts-header h3 { color: #42a5f5; font-size: 1.3em; }
+        .parts-instruction {
+            text-align: center; color: #666; font-size: 0.95em; margin-bottom: 20px;
+            padding: 10px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #42a5f5;
+        }
+        .parts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .part-card {
+            background: white; border-radius: 10px; padding: 15px; text-align: center;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid #e3f2fd; position: relative;
+        }
+        .part-card:hover {
+            transform: translateY(-8px) scale(1.05); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+            border-color: #64b5f6;
+        }
+        .part-card.selected {
+            border-color: #66bb6a; background: linear-gradient(145deg, #e8f5e9, #d4edda);
+            transform: translateY(-12px) scale(1.08); box-shadow: 0 15px 35px rgba(102, 187, 106, 0.4);
+            animation: selectedPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes selectedPulse {
+            0%, 100% { box-shadow: 0 15px 35px rgba(102, 187, 106, 0.4); }
+            50% { box-shadow: 0 15px 45px rgba(102, 187, 106, 0.6); }
+        }
+        .part-card.assembled { opacity: 0.3; pointer-events: none; transform: scale(0.9); filter: grayscale(0.5); }
+        .part-image {
+            width: 80px; height: 80px; margin: 0 auto 10px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #e3f2fd; transition: all 0.3s; background: white;
+        }
+        .part-image img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .part-card:hover .part-image { border-color: #64b5f6; box-shadow: 0 0 20px rgba(100, 181, 246, 0.3); transform: scale(1.1); }
+        .part-card.selected .part-image { border-color: #66bb6a; box-shadow: 0 0 25px rgba(102, 187, 106, 0.5); }
+        .part-name { font-weight: 600; color: #42a5f5; font-size: 0.95em; margin-bottom: 5px; }
+        .part-specs { font-size: 0.8em; color: #666; }
+        .assembly-zone { flex: 2; min-width: 500px; background: #f8f9fa; border-radius: 12px; padding: 25px; border: 2px solid #e3f2fd; }
+        .assembly-target { background: white; border-radius: 15px; padding: 30px; min-height: 550px; border: 3px solid #42a5f5; position: relative; }
+        .assembly-target h4 { text-align: center; color: #42a5f5; margin-bottom: 20px; font-size: 1.2em; }
+        .target-visual {
+            position: relative; width: 100%; height: 480px; border-radius: 15px;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%);
+            border: 2px solid #bbdefb;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .drone-frame {
+            position: relative; width: 400px; height: 400px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .frame-image {
+            width: 100%; height: 100%;
+            background: url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=quadcopter%20drone%20frame%20top%20view%2C%20carbon%20fiber%2C%20realistic%2C%20technical%20drawing&image_size=landscape_4_3') center/cover no-repeat;
+            border-radius: 10px;
+            position: relative;
+        }
+        .placement-area {
+            position: absolute; border: 2px dashed #64b5f6;
+            background: rgba(100, 181, 246, 0.1); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .placement-area:hover {
+            background: rgba(100, 181, 246, 0.2);
+            border-color: #42a5f5;
+            transform: scale(1.05);
+        }
+        .placement-area.hovered {
+            background: rgba(102, 187, 106, 0.2);
+            border-color: #66bb6a;
+        }
+        .placement-area.filled {
+            background: rgba(102, 187, 106, 0.1);
+            border: 2px solid #66bb6a;
+            cursor: default;
+        }
+        .placement-image {
+            max-width: 80%; max-height: 80%; object-fit: contain;
+        }
+        .assembly-guide { background: linear-gradient(145deg, #e3f2fd, #bbdefb); border-radius: 10px; padding: 20px; margin-top: 20px; border-left: 4px solid #42a5f5; }
+        .guide-title { color: #42a5f5; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .guide-content { color: #333; line-height: 1.8; }
+        .guide-step { display: flex; align-items: flex-start; margin-bottom: 8px; animation: slideIn 0.4s ease-out; animation-fill-mode: both; }
+        .guide-step:nth-child(1) { animation-delay: 0.1s; }
+        .guide-step:nth-child(2) { animation-delay: 0.2s; }
+        .guide-step:nth-child(3) { animation-delay: 0.3s; }
+        .guide-step:nth-child(4) { animation-delay: 0.4s; }
+        .guide-step:nth-child(5) { animation-delay: 0.5s; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .guide-step-num {
+            width: 24px; height: 24px; background: #42a5f5; color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 10px; flex-shrink: 0;
+        }
+        .assembled-parts-panel {
+            background: rgba(255, 255, 255, 0.95); border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); border: 2px solid #66bb6a;
+            padding: 30px; margin-top: 30px; display: none;
+        }
+        .assembled-parts-title { color: #66bb6a; text-align: center; margin-bottom: 20px; font-size: 1.5em; }
+        .assembled-parts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .assembled-part-card {
+            background: linear-gradient(145deg, #e8f5e9, #c8e6c9); border-radius: 12px; padding: 20px;
+            text-align: center; border: 2px solid #66bb6a; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: cardAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes cardAppear { 0% { opacity: 0; transform: scale(0.5) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        .assembled-part-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(102, 187, 106, 0.4); }
+        .assembled-part-icon { font-size: 3em; margin-bottom: 10px; }
+        .assembled-part-name { font-weight: 600; color: #42a5f5; margin-bottom: 5px; }
+        .assembled-part-status { font-size: 0.85em; color: #66bb6a; }
+        .result-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center;
+            align-items: center; backdrop-filter: blur(10px);
+        }
+        .modal-content {
+            background-color: white; padding: 50px; border-radius: 20px; max-width: 700px;
+            width: 90%; text-align: center; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+            border: 3px solid #64b5f6; animation: modalAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalAppear { 0% { opacity: 0; transform: scale(0.8) translateY(50px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-icon { font-size: 5em; margin-bottom: 20px; animation: iconBounce 1s ease-in-out infinite; }
+        @keyframes iconBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .modal-title { color: #42a5f5; margin-bottom: 15px; font-size: 2em; }
+        .modal-message { color: #666; font-size: 1.1em; margin-bottom: 30px; line-height: 1.6; }
+        .modal-stats { display: flex; justify-content: space-around; margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 12px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 3em; font-weight: bold; display: block; }
+        .stat-label { font-size: 1em; color: #666; }
+        .correct-stat .stat-value { color: #66bb6a; }
+        .time-stat .stat-value { color: #42a5f5; }
+        .modal-buttons { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
+        .progress-bar-container { background: #e3f2fd; border-radius: 10px; padding: 15px; margin-bottom: 20px; }
+        .progress-bar-label { display: flex; justify-content: space-between; margin-bottom: 10px; color: #42a5f5; font-weight: 600; }
+        .progress-bar { height: 12px; background: #bbdefb; border-radius: 6px; overflow: hidden; }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #64b5f6, #42a5f5);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 6px; position: relative;
+        }
+        .progress-fill::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        @media (max-width: 900px) {
+            .assembly-workspace { flex-direction: column; }
+            .parts-selection, .assembly-zone { min-width: 100%; }
+            .training-header { flex-direction: column; gap: 15px; }
+            .back-button { position: static; margin-bottom: 20px; }
+            .drone-frame { width: 300px; height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">← 返回首页</button>
+    <div class="container">
+        <header>
+            <h1>🚁 无人机组装实训系统</h1>
+            <p class="subtitle">学习专业无人机的组装流程与技术 - 平面模型</p>
+        </header>
+        <div class="drone-type-selection" id="drone-type-selection">
+            <h2 class="section-title">第一步：选择无人机类型</h2>
+            <p class="section-subtitle">不同类型的无人机有不同的结构和功能，选择后将进入对应的组装实训</p>
+            <div class="drone-type-grid">
+                <div class="drone-type-card" data-type="quadcopter">
+                    <div class="drone-type-header">
+                        <div class="drone-type-icon">🛸</div>
+                        <div class="drone-type-info">
+                            <h3>四轴无人机</h3>
+                            <p>入门级多旋翼无人机</p>
+                        </div>
+                    </div>
+                    <div class="drone-specs">
+                        <div class="spec-item"><span class="spec-icon">⚙️</span><span class="spec-text">4个螺旋桨</span></div>
+                        <div class="spec-item"><span class="spec-icon">🔋</span><span class="spec-text">锂电池供电</span></div>
+                        <div class="spec-item"><span class="spec-icon">📷</span><span class="spec-text">可选摄像头</span></div>
+                        <div class="spec-item"><span class="spec-icon">🎮</span><span class="spec-text">遥控器控制</span></div>
+                    </div>
+                </div>
+                <div class="drone-type-card" data-type="hexcopter">
+                    <div class="drone-type-header">
+                        <div class="drone-type-icon">🛩️</div>
+                        <div class="drone-type-info">
+                            <h3>六轴无人机</h3>
+                            <p>专业航拍与测绘</p>
+                        </div>
+                    </div>
+                    <div class="drone-specs">
+                        <div class="spec-item"><span class="spec-icon">⚙️</span><span class="spec-text">6个螺旋桨</span></div>
+                        <div class="spec-item"><span class="spec-icon">🔋</span><span class="spec-text">双电池系统</span></div>
+                        <div class="spec-item"><span class="spec-icon">📷</span><span class="spec-text">专业云台</span></div>
+                        <div class="spec-item"><span class="spec-icon">🧭</span><span class="spec-text">GPS定位</span></div>
+                    </div>
+                </div>
+                <div class="drone-type-card" data-type="racing">
+                    <div class="drone-type-header">
+                        <div class="drone-type-icon">🏎️</div>
+                        <div class="drone-type-info">
+                            <h3>竞速无人机</h3>
+                            <p>高速FPV竞速专用</p>
+                        </div>
+                    </div>
+                    <div class="drone-specs">
+                        <div class="spec-item"><span class="spec-icon">⚡</span><span class="spec-text">高速电机</span></div>
+                        <div class="spec-item"><span class="spec-icon">🔋</span><span class="spec-text">高倍率电池</span></div>
+                        <div class="spec-item"><span class="spec-icon">📹</span><span class="spec-text">FPV摄像头</span></div>
+                        <div class="spec-item"><span class="spec-icon">🎯</span><span class="spec-text">飞行控制器</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="assembly-training" id="assembly-training">
+            <div class="training-header">
+                <h2 class="training-title" id="training-title">无人机组装实训</h2>
+                <div class="training-controls">
+                    <button class="control-btn danger" onclick="resetAllAssembly()">重新开始</button>
+                    <button class="control-btn primary" onclick="checkCurrentStep()">检查当前步骤</button>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-label">
+                    <span>组装进度</span>
+                    <span id="progress-text">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="assembly-steps-nav" id="steps-nav"></div>
+            <div class="assembly-workspace">
+                <div class="parts-selection">
+                    <div class="parts-header"><h3>📦 零件库</h3></div>
+                    <div class="parts-instruction" id="parts-instruction">请从下方选择零件，然后在组装区域点击放置位置</div>
+                    <div class="parts-grid" id="parts-grid"></div>
+                </div>
+                <div class="assembly-zone">
+                    <div class="assembly-target">
+                        <h4 id="target-title">组装区域 - 平面模型</h4>
+                        <div class="target-visual" id="target-visual">
+                            <div class="drone-frame" id="drone-frame">
+                                <div class="frame-image" id="frame-image"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="assembly-guide">
+                        <div class="guide-title">📋 组装指引</div>
+                        <div class="guide-content" id="guide-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="assembled-parts-panel" id="assembled-parts-panel">
+            <h3 class="assembled-parts-title">✅ 已完成的部件组装</h3>
+            <div class="assembled-parts-grid" id="assembled-parts-grid"></div>
+        </div>
+    </div>
+    <div class="result-modal" id="result-modal">
+        <div class="modal-content">
+            <div class="modal-icon" id="modal-icon">🎉</div>
+            <h2 class="modal-title" id="modal-title">组装结果</h2>
+            <p class="modal-message" id="modal-message"></p>
+            <div class="modal-stats">
+                <div class="stat-item correct-stat">
+                    <span class="stat-value" id="correct-count">0</span>
+                    <span class="stat-label">正确</span>
+                </div>
+                <div class="stat-item time-stat">
+                    <span class="stat-value" id="time-count">0</span>
+                    <span class="stat-label">用时(秒)</span>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeModal()">查看结果</button>
+                <button class="control-btn primary" onclick="nextStep()">下一步</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const droneData = {
+            quadcopter: {
+                name: '四轴无人机', icon: '🛸',
+                frameImage: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=quadcopter%20drone%20frame%20top%20view%2C%20carbon%20fiber%2C%20realistic%2C%20technical%20drawing&image_size=landscape_4_3',
+                steps: [
+                    {
+                        id: 1, name: '组装机身框架', description: '机身是无人机的核心结构', icon: '🔧',
+                        guide: ['首先取出碳纤维机身板，注意轻拿轻放', '将4个电机座安装到机臂的预留孔位', '使用螺丝刀紧固电机座，注意力度适中', '安装中心板，连接上下层框架', '检查所有螺丝是否拧紧'],
+                        parts: [
+                            { id: 'frame', name: '碳纤维机架', specs: '420mm轴距', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=carbon%20fiber%20drone%20frame%2C%20quadcopter%20frame%2C%20realistic&image_size=square' },
+                            { id: 'motor-mount', name: '电机座×4', specs: '铝合金材质', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=aluminum%20motor%20mount%20for%20drone%2C%20realistic&image_size=square' },
+                            { id: 'center-plate', name: '中心板', specs: '电池安装位', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=drone%20center%20plate%2C%20circuit%20board%2C%20realistic&image_size=square' },
+                            { id: 'screw-kit', name: '螺丝套装', specs: 'M3×10', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=drone%20screw%20kit%2C%20M3%20screws%2C%20realistic&image_size=square' }
+                        ],
+                        positions: [
+                            { id: 'frame-pos', name: '机架', left: '50%', top: '50%', width: '80%', height: '80%', transform: 'translate(-50%, -50%)' }
+                        ]
+                    },
+                    {
+                        id: 2, name: '安装动力系统', description: '电机和螺旋桨提供飞行动力', icon: '⚡',
+                        guide: ['将电机安装到电机座上，注意电机轴朝上', '电机的旋转方向很重要：相邻电机转向相反', '安装螺旋桨，区分正反桨（CW/CCW）', '使用螺帽固定螺旋桨，确保安全', '测试电机是否能正常旋转'],
+                        parts: [
+                            { id: 'motor-ccw', name: '逆时针电机×2', specs: '2300KV', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=drone%20brushless%20motor%2C%20CCW%20rotation%2C%20realistic&image_size=square' },
+                            { id: 'motor-cw', name: '顺时针电机×2', specs: '2300KV', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=drone%20brushless%20motor%2C%20CW%20rotation%2C%20realistic&image_size=square' },
+                            { id: 'prop-cw', name: '正桨(CW)×2', specs: '5寸三叶桨', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=drone%20propeller%2C%20CW%20rotation%2C%205%20inch%2C%20realistic&image_size=square' },
+                            { id: 'prop-ccw', name: '反桨(CCW)×2', specs: '5寸三叶桨', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=drone%20propeller%2C%20CCW%20rotation%2C%205%20inch%2C%20realistic&image_size=square' },
+                            { id: 'prop-nut', name: '桨帽套装', specs: 'M5尼龙螺母', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=propeller%20nuts%20for%20drone%2C%20M5%20nylon%20nuts%2C%20realistic&image_size=square' }
+                        ],
+                        positions: [
+                            { id: 'motor-1-pos', name: '前左电机', left: '20%', top: '20%', width: '20%', height: '20%' },
+                            { id: 'motor-2-pos', name: '前右电机', left: '70%', top: '20%', width: '20%', height: '20%' },
+                            { id: 'motor-3-pos', name: '后左电机', left: '20%', top: '70%', width: '20%', height: '20%' },
+                            { id: 'motor-4-pos', name: '后右电机', left: '70%', top: '70%', width: '20%', height: '20%' }
+                        ]
+                    },
+                    {
+                        id: 3, name: '安装电池与配电', description: '电池系统提供动力', icon: '🔋',
+                        guide: ['选择合适的锂电池（3S 11.1V 2200mAh）', '安装电池固定板，调整位置使重心居中', '连接ESC电调到电池XT60接口', '安装分电板，分配各路电源', '连接电压检测模块'],
+                        parts: [
+                            { id: 'battery', name: '锂电池', specs: '3S 2200mAh', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=lithium%20polymer%20battery%203S%202200mAh%2C%20drone%20battery%2C%20realistic&image_size=square' },
+                            { id: 'battery-plate', name: '电池固定板', specs: '魔术贴面', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=battery%20mount%20plate%20for%20drone%2C%20velcro%20straps%2C%20realistic&image_size=square' },
+                            { id: 'esc', name: '四合一电调', specs: '30A', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=4-in-1%20ESC%2030A%2C%20drone%20electronic%20speed%20controller%2C%20realistic&image_size=square' },
+                            { id: 'pdb', name: '分电板', specs: 'PDB 5V/12V', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=power%20distribution%20board%20PDB%2C%20drone%20power%20board%2C%20realistic&image_size=square' },
+                            { id: 'xt60', name: 'XT60接头', specs: '防反接', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=XT60%20connector%20for%20drone%20battery%2C%20realistic&image_size=square' }
+                        ],
+                        positions: [
+                            { id: 'battery-pos', name: '电池', left: '50%', top: '50%', width: '40%', height: '30%', transform: 'translate(-50%, -50%)' },
+                            { id: 'esc-pos', name: '电调模块', left: '30%', top: '50%', width: '30%', height: '20%', transform: 'translate(-50%, -50%)' },
+                            { id: 'pdb-pos', name: '分电板', left: '70%', top: '50%', width: '30%', height: '20%', transform: 'translate(-50%, -50%)' }
+                        ]
+                    },
+                    {
+                        id: 4, name: '安装飞行控制系统', description: '飞控是无人机的大脑', icon: '🧠',
+                        guide: ['选择Pixhawk或类似飞控板', '安装减震座，保护飞控免受震动', '将飞控板安装在机架中心位置', '连接GPS模块到指定端口', '连接遥控接收器到飞控'],
+                        parts: [
+                            { id: 'flight-controller', name: '飞行控制器', specs: 'Pixhawk 2.4.8', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Pixhawk%20flight%20controller%202.4.8%2C%20drone%20brain%2C%20realistic&image_size=square' },
+                            { id: 'gps-module', name: 'GPS模块', specs: 'M8N带罗盘', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=GPS%20module%20M8N%20with%20compass%2C%20drone%20GPS%2C%20realistic&image_size=square' },
+                            { id: 'receiver', name: '遥控接收机', specs: 'SBUS/PPM', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=radio%20receiver%20SBUS%20PPM%2C%20drone%20receiver%2C%20realistic&image_size=square' },
+                            { id: 'vibration-damp', name: '减震座', specs: '红色硅胶', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=vibration%20dampers%20for%20drone%20flight%20controller%2C%20red%20silicone%2C%20realistic&image_size=square' },
+                            { id: 'buzzer', name: '蜂鸣器', specs: '低电压报警', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=drone%20buzzer%20for%20low%20voltage%20alarm%2C%20realistic&image_size=square' }
+                        ],
+                        positions: [
+                            { id: 'fc-pos', name: '飞控', left: '50%', top: '50%', width: '25%', height: '25%', transform: 'translate(-50%, -50%)' },
+                            { id: 'gps-pos', name: 'GPS', left: '50%', top: '15%', width: '20%', height: '20%', transform: 'translate(-50%, 0)' },
+                            { id: 'rx-pos', name: '接收机', left: '80%', top: '50%', width: '20%', height: '20%', transform: 'translate(-50%, -50%)' },
+                            { id: 'buzzer-pos', name: '蜂鸣器', left: '20%', top: '50%', width: '15%', height: '15%', transform: 'translate(-50%, -50%)' }
+                        ]
+                    },
+                    {
+                        id: 5, name: '总装与调试', description: '完成整机组装', icon: '✨',
+                        guide: ['安装螺旋桨保护罩（可选）', '检查所有接线是否牢固', '校准陀螺仪和加速度计', '设置遥控器通道映射', '进行电机转向测试', '执行最终的飞行前检查清单'],
+                        parts: [
+                            { id: 'prop-guard', name: '桨保护罩×4', specs: 'ABS材质', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=propeller%20guard%20for%20drone%2C%20ABS%20material%2C%20realistic&image_size=square' },
+                            { id: 'landing-gear', name: '起落架', specs: '可折叠', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=drone%20landing%20gear%2C%20foldable%2C%20realistic&image_size=square' },
+                            { id: 'led-strip', name: 'LED灯带', specs: 'WS2812 RGB', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=LED%20strip%20WS2812%20RGB%20for%20drone%2C%20realistic&image_size=square' },
+                            { id: 'antenna-mount', name: '天线支架', specs: '90度弯头', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=antenna%20mount%2090%20degree%20for%20drone%2C%20realistic&image_size=square' }
+                        ],
+                        positions: [
+                            { id: 'gear-pos', name: '起落架', left: '50%', top: '80%', width: '40%', height: '20%', transform: 'translate(-50%, 0)' },
+                            { id: 'antenna-pos', name: '天线', left: '70%', top: '20%', width: '15%', height: '15%', transform: 'translate(-50%, 0)' }
+                        ]
+                    }
+                ]
+            },
+            hexcopter: {
+                name: '六轴无人机', icon: '🛩️',
+                frameImage: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hexacopter%20drone%20frame%20top%20view%2C%20carbon%20fiber%2C%20realistic%2C%20technical%20drawing&image_size=landscape_4_3',
+                steps: [
+                    {
+                        id: 1, name: '组装六轴机架', description: '六轴机架更稳定', icon: '🔧',
+                        guide: ['取出六轴碳纤维机架', '安装6个电机座', '连接中心框架和6条机臂', '安装上板和下板', '检查结构完整性'],
+                        parts: [
+                            { id: 'hex-frame', name: '六轴机架', specs: '550mm轴距', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hexacopter%20drone%20frame%2C%20carbon%20fiber%2C%20realistic&image_size=square' },
+                            { id: 'hex-motor-mount', name: '电机座×6', specs: '铝合金', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=aluminum%20motor%20mount%20for%20hexacopter%2C%20realistic&image_size=square' },
+                            { id: 'hex-center', name: '中心板组', specs: '上下层', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hexacopter%20center%20plate%20set%2C%20realistic&image_size=square' }
+                        ],
+                        positions: [
+                            { id: 'hex-frame-pos', name: '机架', left: '50%', top: '50%', width: '80%', height: '80%', transform: 'translate(-50%, -50%)' }
+                        ]
+                    }
+                ]
+            },
+            racing: {
+                name: '竞速无人机', icon: '🏎️',
+                frameImage: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=racing%20drone%20frame%20top%20view%2C%20carbon%20fiber%2C%20realistic%2C%20technical%20drawing&image_size=landscape_4_3',
+                steps: [
+                    {
+                        id: 1, name: '组装轻量化机架', description: '竞速追求极致轻量化', icon: '🔧',
+                        guide: ['选择碳纤维实心板或镂空板', '尽可能减少不必要的结构', '使用轻量化螺丝和配件', '确保结构强度满足竞速需求'],
+                        parts: [
+                            { id: 'race-frame', name: '竞速机架', specs: '5寸碳纤', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=racing%20drone%20frame%2C%205%20inch%20carbon%20fiber%2C%20realistic&image_size=square' },
+                            { id: 'race-plate', name: '主板', specs: '3mm碳纤', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=racing%20drone%20main%20plate%2C%203mm%20carbon%20fiber%2C%20realistic&image_size=square' },
+                            { id: 'titanium-screw', name: '钛螺丝套装', specs: 'M3×20', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=titanium%20screw%20kit%20M3×20%2C%20racing%20drone%20parts%2C%20realistic&image_size=square' }
+                        ],
+                        positions: [
+                            { id: 'race-frame-pos', name: '机架', left: '50%', top: '50%', width: '70%', height: '70%', transform: 'translate(-50%, -50%)' }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        let selectedDroneType = null;
+        let currentStep = 0;
+        let currentAssembly = {};
+        let startTime = 0;
+        let draggedPart = null;
+        let assembledObjects = {};
+
+        const droneTypeSelection = document.getElementById('drone-type-selection');
+        const assemblyTraining = document.getElementById('assembly-training');
+        const trainingTitle = document.getElementById('training-title');
+        const stepsNav = document.getElementById('steps-nav');
+        const partsGrid = document.getElementById('parts-grid');
+        const partsInstruction = document.getElementById('parts-instruction');
+        const targetVisual = document.getElementById('target-visual');
+        const targetTitle = document.getElementById('target-title');
+        const guideContent = document.getElementById('guide-content');
+        const assembledPartsPanel = document.getElementById('assembled-parts-panel');
+        const assembledPartsGrid = document.getElementById('assembled-parts-grid');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const resultModal = document.getElementById('result-modal');
+        const droneFrame = document.getElementById('drone-frame');
+        const frameImage = document.getElementById('frame-image');
+
+        function init() {
+            document.querySelectorAll('.drone-type-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.drone-type-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    selectedDroneType = card.getAttribute('data-type');
+                    
+                    if (!selectedDroneType || !droneData[selectedDroneType]) {
+                        console.error('Invalid drone type:', selectedDroneType);
+                        return;
+                    }
+                    
+                    droneTypeSelection.style.display = 'none';
+                    assemblyTraining.style.display = 'block';
+                    
+                    currentStep = 0;
+                    startTime = Date.now();
+                    loadStep(0);
+                });
+            });
+        }
+
+        function loadStep(stepIndex) {
+            if (!droneData[selectedDroneType] || !droneData[selectedDroneType].steps[stepIndex]) {
+                console.error('Invalid step data:', selectedDroneType, stepIndex);
+                return;
+            }
+            
+            const stepData = droneData[selectedDroneType].steps[stepIndex];
+            currentAssembly = {};
+            assembledObjects = {};
+
+            targetTitle.textContent = `${stepData.name} - 平面模型`;
+            trainingTitle.textContent = `${droneData[selectedDroneType].name} - ${stepData.name}`;
+
+            guideContent.innerHTML = '';
+            stepData.guide.forEach((step, index) => {
+                const stepElement = document.createElement('div');
+                stepElement.className = 'guide-step';
+                stepElement.innerHTML = `
+                    <div class="guide-step-num">${index + 1}</div>
+                    <div>${step}</div>
+                `;
+                guideContent.appendChild(stepElement);
+            });
+
+            partsGrid.innerHTML = '';
+            stepData.parts.forEach(part => {
+                const partCard = document.createElement('div');
+                partCard.className = 'part-card';
+                partCard.setAttribute('data-part-id', part.id);
+                partCard.innerHTML = `
+                    <div class="part-image">
+                        <img src="${part.image}" alt="${part.name}">
+                    </div>
+                    <div class="part-name">${part.name}</div>
+                    <div class="part-specs">${part.specs}</div>
+                `;
+                partCard.addEventListener('click', () => selectPart(part));
+                partsGrid.appendChild(partCard);
+            });
+
+            frameImage.style.backgroundImage = `url('${droneData[selectedDroneType].frameImage}')`;
+            
+            droneFrame.innerHTML = `<div class="frame-image" style="background-image: url('${droneData[selectedDroneType].frameImage}');"></div>`;
+            
+            stepData.positions.forEach(pos => {
+                const placementArea = document.createElement('div');
+                placementArea.className = 'placement-area';
+                placementArea.setAttribute('data-pos-id', pos.id);
+                placementArea.style.left = pos.left;
+                placementArea.style.top = pos.top;
+                placementArea.style.width = pos.width;
+                placementArea.style.height = pos.height;
+                if (pos.transform) {
+                    placementArea.style.transform = pos.transform;
+                }
+                placementArea.addEventListener('click', () => placePart(pos.id));
+                placementArea.addEventListener('mouseenter', () => {
+                    if (draggedPart) placementArea.classList.add('hovered');
+                });
+                placementArea.addEventListener('mouseleave', () => {
+                    placementArea.classList.remove('hovered');
+                });
+                droneFrame.appendChild(placementArea);
+            });
+
+            updateStepsNav();
+            updateProgress();
+        }
+
+        function selectPart(part) {
+            draggedPart = part;
+            
+            document.querySelectorAll('.part-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            const selectedCard = document.querySelector(`.part-card[data-part-id="${part.id}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+
+            partsInstruction.textContent = `已选择「${part.name}」，请在组装区域点击放置位置`;
+        }
+
+        function placePart(posId) {
+            if (!draggedPart) return;
+
+            const currentStepData = droneData[selectedDroneType].steps[currentStep];
+            const position = currentStepData.positions.find(p => p.id === posId);
+            if (!position) return;
+
+            const placementArea = document.querySelector(`.placement-area[data-pos-id="${posId}"]`);
+            if (placementArea && !assembledObjects[posId]) {
+                placementArea.innerHTML = `<img src="${draggedPart.image}" class="placement-image" alt="${draggedPart.name}">`;
+                placementArea.classList.add('filled');
+                placementArea.classList.remove('hovered');
+                
+                assembledObjects[posId] = draggedPart;
+                
+                const partCard = document.querySelector(`.part-card[data-part-id="${draggedPart.id}"]`);
+                if (partCard) {
+                    partCard.classList.add('assembled');
+                    partCard.classList.remove('selected');
+                }
+                
+                draggedPart = null;
+                partsInstruction.textContent = '请从下方选择零件，然后在组装区域点击放置位置';
+                
+                checkStepCompletion();
+            }
+        }
+
+        function checkStepCompletion() {
+            const currentStepData = droneData[selectedDroneType].steps[currentStep];
+            const requiredPositions = currentStepData.positions.length;
+            const filledPositions = Object.keys(assembledObjects).length;
+
+            if (filledPositions >= requiredPositions) {
+                setTimeout(() => {
+                    showCompletionModal();
+                }, 1000);
+            }
+        }
+
+        function showCompletionModal() {
+            const modalIcon = document.getElementById('modal-icon');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMessage = document.getElementById('modal-message');
+            const correctCount = document.getElementById('correct-count');
+            const timeCount = document.getElementById('time-count');
+
+            modalIcon.textContent = '🎉';
+            modalTitle.textContent = '步骤完成！';
+            modalMessage.textContent = `恭喜你完成了「${droneData[selectedDroneType].steps[currentStep].name}」步骤的组装。\n\n你已经成功安装了所有必要的部件，组装质量良好。`;
+            correctCount.textContent = droneData[selectedDroneType].steps[currentStep].positions.length;
+            timeCount.textContent = Math.round((Date.now() - startTime) / 1000);
+
+            resultModal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            resultModal.style.display = 'none';
+        }
+
+        function nextStep() {
+            closeModal();
+            currentStep++;
+            if (currentStep < droneData[selectedDroneType].steps.length) {
+                loadStep(currentStep);
+            } else {
+                showFinalCompletion();
+            }
+        }
+
+        function showFinalCompletion() {
+            const modalIcon = document.getElementById('modal-icon');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMessage = document.getElementById('modal-message');
+            const correctCount = document.getElementById('correct-count');
+            const timeCount = document.getElementById('time-count');
+
+            modalIcon.textContent = '🏆';
+            modalTitle.textContent = '组装完成！';
+            modalMessage.textContent = `恭喜你完成了「${droneData[selectedDroneType].name}」的全部组装步骤！\n\n你已经成功安装了所有部件，无人机已经准备就绪。\n\n通过这个实训，你学习了无人机的基本结构和组装流程，掌握了各部件的功能和安装位置。`;
+            correctCount.textContent = droneData[selectedDroneType].steps.reduce((total, step) => total + step.positions.length, 0);
+            timeCount.textContent = Math.round((Date.now() - startTime) / 1000);
+
+            resultModal.style.display = 'flex';
+
+            document.querySelector('.modal-buttons').innerHTML = `
+                <button class="control-btn" onclick="resetAllAssembly()">重新开始</button>
+                <button class="control-btn primary" onclick="window.location.href='index.html'">返回首页</button>
+            `;
+        }
+
+        function checkCurrentStep() {
+            const currentStepData = droneData[selectedDroneType].steps[currentStep];
+            const requiredPositions = currentStepData.positions.length;
+            const filledPositions = Object.keys(assembledObjects).length;
+
+            if (filledPositions >= requiredPositions) {
+                showCompletionModal();
+            } else {
+                alert('请完成当前步骤的所有组装任务');
+            }
+        }
+
+        function resetAllAssembly() {
+            currentStep = 0;
+            currentAssembly = {};
+            assembledObjects = {};
+            startTime = Date.now();
+            loadStep(0);
+        }
+
+        function updateStepsNav() {
+            stepsNav.innerHTML = '';
+            droneData[selectedDroneType].steps.forEach((step, index) => {
+                const stepBtn = document.createElement('button');
+                stepBtn.className = `step-btn ${index === currentStep ? 'active' : index < currentStep ? 'completed' : ''}`;
+                stepBtn.innerHTML = `
+                    <span class="step-number">${step.id}</span>
+                    ${step.name}
+                `;
+                stepBtn.addEventListener('click', () => {
+                    if (index <= currentStep) {
+                        currentStep = index;
+                        loadStep(index);
+                    }
+                });
+                stepsNav.appendChild(stepBtn);
+            });
+        }
+
+        function updateProgress() {
+            const totalSteps = droneData[selectedDroneType].steps.length;
+            const progress = ((currentStep + 1) / totalSteps) * 100;
+            progressFill.style.width = `${progress}%`;
+            progressText.textContent = `${Math.round(progress)}%`;
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

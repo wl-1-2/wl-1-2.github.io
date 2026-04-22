@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计算机学科 - 学科模拟学习平台</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #3a506b, #1c2541);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            margin-top: 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .function-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .function-button {
+            flex: 1;
+            max-width: 400px;
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 40px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .function-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .function-button .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .knowledge-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #3a506b;
+        }
+        
+        .section-title {
+            color: #3a506b;
+            border-bottom: 2px solid #99a3b3;
+            padding-bottom: 15px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+        
+        .knowledge-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .knowledge-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .knowledge-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .knowledge-card h3 {
+            color: #3a506b;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .knowledge-card p {
+            line-height: 1.6;
+            color: #666;
+        }
+        
+        .questions-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #3a506b;
+        }
+        
+        .question-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .question-card h3 {
+            color: #3a506b;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .question-card p {
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .question-options {
+            margin-bottom: 15px;
+        }
+        
+        .option {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .option:hover {
+            background: #e6f2ff;
+            border-color: #3498db;
+        }
+        
+        .option.correct {
+            background: #c8e6c9;
+            border-color: #27ae60;
+        }
+        
+        .option.incorrect {
+            background: #ffcdd2;
+            border-color: #e74c3c;
+        }
+        
+        .answer-button {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .answer-button:hover {
+            background: linear-gradient(145deg, #2980b9, #3498db);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .function-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .function-button {
+                max-width: 100%;
+                width: 100%;
+            }
+            
+            .back-button {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">← 返回首页</button>
+    
+    <div class="container">
+        <header>
+            <h1>计算机学科</h1>
+            <p class="subtitle">计算机组装与电路模拟实验</p>
+        </header>
+        
+        <div class="function-buttons">
+            <button class="function-button" onclick="window.location.href='computer-assembly.html'">
+                <span class="icon">🖥️</span>
+                计算机组装实验
+            </button>
+            <button class="function-button" onclick="window.location.href='circuit-simulation.html'">
+                <span class="icon">⚡</span>
+                电路模拟实验
+            </button>
+        </div>
+        
+        <div class="knowledge-section">
+            <h2 class="section-title">知识点</h2>
+            <div class="knowledge-cards">
+                <div class="knowledge-card">
+                    <h3>计算机硬件组成</h3>
+                    <p>计算机由中央处理器(CPU)、内存、存储设备、输入设备和输出设备等组成。各组件通过主板连接，协同工作完成各种计算任务。</p>
+                </div>
+                <div class="knowledge-card">
+                    <h3>接口类型与功能</h3>
+                    <p>常见的计算机接口包括USB、HDMI、VGA、音频接口、网络接口等，每种接口都有特定的用途和传输标准。</p>
+                </div>
+                <div class="knowledge-card">
+                    <h3>电路基本原理</h3>
+                    <p>电路是由电源、导线、开关、负载等组成的闭合回路。电流在电路中从正极流向负极，形成完整的电流路径。</p>
+                </div>
+                <div class="knowledge-card">
+                    <h3>串联与并联电路</h3>
+                    <p>串联电路中，元件依次连接，电流相同；并联电路中，元件并排连接，电压相同。不同的连接方式会影响电路的总电阻和电流分布。</p>
+                </div>
+                <div class="knowledge-card">
+                    <h3>数字逻辑电路</h3>
+                    <p>数字逻辑电路使用二进制信号（0和1）进行运算，包括与门、或门、非门等基本逻辑门，是计算机内部运算的基础。</p>
+                </div>
+                <div class="knowledge-card">
+                    <h3>电路故障排查</h3>
+                    <p>电路故障排查包括检查电源、导线连接、元件损坏等，通过万用表等工具测量电压、电流和电阻来定位问题。</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="questions-section">
+            <h2 class="section-title">练习题</h2>
+            
+            <div class="question-card">
+                <h3>问题1：计算机的核心组件是什么？</h3>
+                <p>以下哪个选项是计算机的核心处理组件？</p>
+                <div class="question-options">
+                    <div class="option" data-correct="false">A. 内存</div>
+                    <div class="option" data-correct="true">B. 中央处理器(CPU)</div>
+                    <div class="option" data-correct="false">C. 硬盘</div>
+                    <div class="option" data-correct="false">D. 主板</div>
+                </div>
+                <button class="answer-button" onclick="checkAnswer(this)">查看答案</button>
+            </div>
+            
+            <div class="question-card">
+                <h3>问题2：串联电路的特点是什么？</h3>
+                <p>关于串联电路，下列说法正确的是：</p>
+                <div class="question-options">
+                    <div class="option" data-correct="false">A. 各元件电压相同</div>
+                    <div class="option" data-correct="true">B. 各元件电流相同</div>
+                    <div class="option" data-correct="false">C. 总电阻等于各电阻之和的倒数</div>
+                    <div class="option" data-correct="false">D. 一个元件损坏不影响其他元件</div>
+                </div>
+                <button class="answer-button" onclick="checkAnswer(this)">查看答案</button>
+            </div>
+            
+            <div class="question-card">
+                <h3>问题3：USB接口的主要用途是什么？</h3>
+                <p>USB接口主要用于：</p>
+                <div class="question-options">
+                    <div class="option" data-correct="false">A. 视频输出</div>
+                    <div class="option" data-correct="true">B. 数据传输和设备连接</div>
+                    <div class="option" data-correct="false">C. 网络连接</div>
+                    <div class="option" data-correct="false">D. 音频输出</div>
+                </div>
+                <button class="answer-button" onclick="checkAnswer(this)">查看答案</button>
+            </div>
+            
+            <div class="question-card">
+                <h3>问题4：并联电路中，当一个元件短路时会发生什么？</h3>
+                <p>在并联电路中，如果一个元件发生短路，会：</p>
+                <div class="question-options">
+                    <div class="option" data-correct="false">A. 所有元件停止工作</div>
+                    <div class="option" data-correct="false">B. 其他元件正常工作</div>
+                    <div class="option" data-correct="true">C. 可能导致电源损坏</div>
+                    <div class="option" data-correct="false">D. 总电阻增大</div>
+                </div>
+                <button class="answer-button" onclick="checkAnswer(this)">查看答案</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function checkAnswer(button) {
+            const questionCard = button.closest('.question-card');
+            const options = questionCard.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                if (option.dataset.correct === 'true') {
+                    option.classList.add('correct');
+                } else if (option.classList.contains('selected')) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            button.disabled = true;
+            button.textContent = '答案已显示';
+        }
+        
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const options = this.closest('.question-options').querySelectorAll('.option');
+                options.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+    </script>
+</body>
+</html>

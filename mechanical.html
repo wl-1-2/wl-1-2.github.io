@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机械学科 - 工程力学模拟实验</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            min-height: 100vh;
+            position: relative;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .back-button {
+            position: absolute; top: 20px; left: 20px;
+            background: linear-gradient(145deg, #4a6fa5, #16213e);
+            color: white; border: none; padding: 10px 20px; border-radius: 8px;
+            cursor: pointer; font-size: 14px; font-weight: 600;
+            transition: all 0.3s; z-index: 100;
+        }
+        .back-button:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(74, 111, 165, 0.4); }
+        header {
+            text-align: center; margin-bottom: 30px; padding: 40px 20px;
+            background: linear-gradient(145deg, #4a6fa5, #16213e); color: white;
+            border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        h1 { margin-top: 0; font-size: 2.5em; color: #ffffff; }
+        .subtitle { font-size: 1.2em; opacity: 0.9; margin-top: 10px; }
+        .tabs { display: flex; gap: 15px; margin-bottom: 30px; justify-content: center; flex-wrap: wrap; }
+        .tab-button {
+            background: linear-gradient(145deg, #4a6fa5, #16213e); color: white;
+            border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;
+            font-size: 16px; font-weight: 600; transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .tab-button:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(74, 111, 165, 0.3); }
+        .tab-button.active { background: linear-gradient(145deg, #27ae60, #229954); }
+        .tab-content {
+            display: none; background: white; border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border: 2px solid #4a6fa5; padding: 40px;
+        }
+        .tab-content.active { display: block; }
+        .equipment-selection {
+            margin-bottom: 30px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .selection-header { text-align: center; margin-bottom: 30px; }
+        .selection-header h2 { color: #4a6fa5; margin-bottom: 10px; font-size: 1.8em; }
+        .selection-header p { color: #666; font-size: 1.1em; }
+        .equipment-options {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px;
+        }
+        .equipment-option {
+            background: linear-gradient(145deg, #f8f9fa, #e3f2fd); border-radius: 12px;
+            padding: 25px; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: 3px solid transparent; position: relative; overflow: hidden;
+        }
+        .equipment-option::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, #4a6fa5, #16213e);
+        }
+        .equipment-option:hover {
+            transform: translateY(-8px); box-shadow: 0 15px 35px rgba(74, 111, 165, 0.2);
+            border-color: #4a6fa5;
+        }
+        .equipment-option.selected { border-color: #27ae60; background: linear-gradient(145deg, #e8f5e9, #c8e6c9); }
+        .equipment-icon { width: 80px; height: 80px; background: linear-gradient(145deg, #4a6fa5, #16213e);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5em; margin: 0 auto 15px; }
+        .equipment-name { color: #4a6fa5; font-size: 1.4em; margin-bottom: 10px; text-align: center; }
+        .equipment-description { color: #666; font-size: 0.9em; line-height: 1.5; text-align: center; }
+        .assembly-section { margin-top: 30px; }
+        .assembly-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #e3f2fd;
+        }
+        .assembly-title { color: #4a6fa5; font-size: 1.8em; }
+        .assembly-controls { display: flex; gap: 15px; }
+        .control-btn {
+            background: linear-gradient(145deg, #4a6fa5, #16213e); color: white;
+            border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;
+            font-size: 14px; font-weight: 600; transition: all 0.3s;
+        }
+        .control-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(74, 111, 165, 0.3); }
+        .control-btn.primary { background: linear-gradient(145deg, #27ae60, #229954); }
+        .control-btn.danger { background: linear-gradient(145deg, #e74c3c, #c0392b); }
+        .workspace { display: flex; gap: 30px; flex-wrap: wrap; }
+        .parts-container {
+            flex: 1; min-width: 300px; background: #f8f9fa; border-radius: 12px;
+            padding: 25px; border: 2px solid #e3f2fd;
+        }
+        .parts-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e3f2fd; }
+        .parts-header h3 { color: #4a6fa5; font-size: 1.3em; }
+        .parts-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px;
+        }
+        .part {
+            background: white; border-radius: 8px; padding: 15px; text-align: center;
+            cursor: grab; transition: all 0.3s;
+            border: 2px solid #e3f2fd; position: relative;
+        }
+        .part:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); border-color: #4a6fa5; }
+        .part.dragging { opacity: 0.8; cursor: grabbing; transform: scale(1.1); z-index: 100; }
+        .part-icon { font-size: 2em; margin-bottom: 10px; }
+        .part-name { font-size: 12px; font-weight: 600; color: #4a6fa5; }
+        .assembly-area {
+            flex: 2; min-width: 500px; background: #f8f9fa; border-radius: 12px;
+            padding: 25px; border: 2px solid #e3f2fd;
+            position: relative; min-height: 500px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .equipment-frame {
+            position: relative; width: 500px; height: 400px;
+            border: 2px solid #4a6fa5; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(145deg, #f8f9fa, #e3f2fd);
+            box-shadow: 0 5px 15px rgba(74, 111, 165, 0.1);
+        }
+        .equipment-model {
+            position: relative; width: 100%; height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .engine-model {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect x="50" y="100" width="300" height="100" fill="%23e3f2fd" stroke="%234a6fa5" stroke-width="2" rx="5"/><circle cx="200" cy="150" r="40" fill="%23bbdefb" stroke="%234a6fa5" stroke-width="2"/><line x1="200" y1="110" x2="200" y2="90" stroke="%234a6fa5" stroke-width="2"/><line x1="200" y1="190" x2="200" y2="210" stroke="%234a6fa5" stroke-width="2"/><line x1="160" y1="150" x2="140" y2="150" stroke="%234a6fa5" stroke-width="2"/><line x1="240" y1="150" x2="260" y2="150" stroke="%234a6fa5" stroke-width="2"/></svg>');
+        }
+        .gearbox-model {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect x="100" y="100" width="200" height="100" fill="%23e3f2fd" stroke="%234a6fa5" stroke-width="2" rx="5"/><circle cx="150" cy="150" r="30" fill="%23bbdefb" stroke="%234a6fa5" stroke-width="2"/><circle cx="250" cy="150" r="30" fill="%23bbdefb" stroke="%234a6fa5" stroke-width="2"/><line x1="120" y1="150" x2="100" y2="150" stroke="%234a6fa5" stroke-width="2"/><line x1="280" y1="150" x2="300" y2="150" stroke="%234a6fa5" stroke-width="2"/><line x1="200" y1="100" x2="200" y2="80" stroke="%234a6fa5" stroke-width="2"/></svg>');
+        }
+        .pump-model {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><ellipse cx="200" cy="150" rx="80" ry="50" fill="%23e3f2fd" stroke="%234a6fa5" stroke-width="2"/><circle cx="120" cy="150" r="20" fill="%23bbdefb" stroke="%234a6fa5" stroke-width="2"/><line x1="100" y1="150" x2="80" y2="150" stroke="%234a6fa5" stroke-width="2"/><path d="M200 100 L230 120 L200 140 L170 120 Z" fill="%234a6fa5" opacity="0.3"/></svg>');
+        }
+        .assembly-position {
+            position: absolute; width: 60px; height: 60px;
+            border: 2px dashed #4a6fa5; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+        }
+        .assembly-position:hover { background: rgba(74, 111, 165, 0.1); border-color: #27ae60; }
+        .assembly-position.filled { border-color: #27ae60; background: rgba(39, 174, 96, 0.1); }
+        .assembly-position.wrong { border-color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
+        
+        /* 工程力学实验样式 */
+        .mechanics-experiment {
+            animation: slideInUp 0.6s ease-out;
+        }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .experiment-header {
+            text-align: center; margin-bottom: 40px;
+            padding: 30px; background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            border-radius: 15px; border-left: 4px solid #4a6fa5;
+        }
+        .experiment-header h2 {
+            color: #4a6fa5; font-size: 2em; margin-bottom: 10px;
+        }
+        .experiment-header p {
+            color: #666; font-size: 1.1em; line-height: 1.6;
+        }
+        .experiment-content {
+            display: flex; gap: 30px; flex-wrap: wrap;
+        }
+        .experiment-controls {
+            flex: 1; min-width: 300px; background: #f8f9fa; border-radius: 12px;
+            padding: 30px; border: 2px solid #e3f2fd;
+        }
+        .control-group {
+            margin-bottom: 25px; padding: 20px; background: white; border-radius: 10px;
+            border-left: 4px solid #4a6fa5;
+        }
+        .control-group label {
+            display: block; color: #4a6fa5; font-weight: 600; margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .control-group select,
+        .control-group input[type="number"],
+        .control-group input[type="range"] {
+            width: 100%; padding: 10px; border: 2px solid #e3f2fd;
+            border-radius: 6px; font-size: 14px; transition: all 0.3s;
+        }
+        .control-group select:focus,
+        .control-group input:focus {
+            outline: none; border-color: #4a6fa5; box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+        }
+        .control-group .range-value {
+            text-align: center; margin-top: 8px; color: #4a6fa5; font-weight: 600;
+        }
+        .experiment-visualization {
+            flex: 2; min-width: 500px; background: #f8f9fa; border-radius: 12px;
+            padding: 30px; border: 2px solid #e3f2fd;
+            min-height: 500px;
+        }
+        .visualization-container {
+            background: white; border-radius: 10px; padding: 20px;
+            min-height: 450px; display: flex; flex-direction: column;
+            border: 2px solid #e3f2fd;
+        }
+        .visualization-area {
+            flex: 1; position: relative; display: flex;
+            align-items: center; justify-content: center;
+            border: 2px solid #e3f2fd; border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .material-sample {
+            position: relative; width: 300px; height: 200px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .sample-body {
+            position: relative; width: 200px; height: 30px;
+            background: linear-gradient(145deg, #4a6fa5, #16213e);
+            border-radius: 4px; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .sample-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+            transition: all 0.3s;
+        }
+        .sample-body.stretched {
+            width: 350px; height: 15px; transform: rotate(0deg);
+            animation: stretchAnimation 1.5s ease-out;
+            box-shadow: 0 2px 8px rgba(74, 111, 165, 0.3);
+        }
+        @keyframes stretchAnimation {
+            0% { width: 200px; height: 30px; box-shadow: 0 0 0 rgba(74, 111, 165, 0); }
+            50% { width: 380px; height: 12px; box-shadow: 0 4px 12px rgba(74, 111, 165, 0.5); }
+            100% { width: 350px; height: 15px; box-shadow: 0 2px 8px rgba(74, 111, 165, 0.3); }
+        }
+        .sample-body.compressed {
+            width: 120px; height: 50px; transform: rotate(0deg);
+            animation: compressAnimation 1.5s ease-out;
+            box-shadow: 0 4px 12px rgba(74, 111, 165, 0.4);
+        }
+        @keyframes compressAnimation {
+            0% { width: 200px; height: 30px; box-shadow: 0 0 0 rgba(74, 111, 165, 0); }
+            50% { width: 100px; height: 55px; box-shadow: 0 6px 16px rgba(74, 111, 165, 0.6); }
+            100% { width: 120px; height: 50px; box-shadow: 0 4px 12px rgba(74, 111, 165, 0.4); }
+        }
+        .sample-body.torsioned {
+            width: 200px; height: 30px;
+            transform: rotate(60deg);
+            animation: torsionAnimation 2s ease-out;
+            box-shadow: 0 4px 12px rgba(74, 111, 165, 0.4);
+        }
+        @keyframes torsionAnimation {
+            0% { transform: rotate(0deg); box-shadow: 0 0 0 rgba(74, 111, 165, 0); }
+            60% { transform: rotate(70deg); box-shadow: 0 6px 16px rgba(74, 111, 165, 0.6); }
+            100% { transform: rotate(60deg); box-shadow: 0 4px 12px rgba(74, 111, 165, 0.4); }
+        }
+        .sample-body.bending {
+            width: 280px; height: 15px;
+            transform: rotate(0deg);
+            background: linear-gradient(90deg, #e74c3c 0%, #3498db 50%, #e74c3c 100%);
+            animation: bendingAnimation 2s ease-out;
+            box-shadow: 0 4px 12px rgba(74, 111, 165, 0.4);
+        }
+        @keyframes bendingAnimation {
+            0% { transform: rotate(0deg); height: 20px; box-shadow: 0 0 0 rgba(74, 111, 165, 0); }
+            30% { transform: rotate(8deg); height: 12px; box-shadow: 0 6px 16px rgba(74, 111, 165, 0.6); }
+            60% { transform: rotate(-4deg); height: 14px; }
+            100% { transform: rotate(0deg); height: 15px; box-shadow: 0 4px 12px rgba(74, 111, 165, 0.4); }
+        }
+        .sample-body.buckled {
+            width: 320px; height: 8px;
+            transform: rotate(0deg);
+            background: linear-gradient(180deg, #e74c3c 0%, #3498db 50%, #e74c3c 100%);
+            animation: buckleAnimation 2.5s ease-out;
+            box-shadow: 0 4px 12px rgba(74, 111, 165, 0.4);
+        }
+        @keyframes buckleAnimation {
+            0% { transform: rotate(0deg); height: 10px; box-shadow: 0 0 0 rgba(74, 111, 165, 0); }
+            25% { transform: rotate(3deg); height: 6px; box-shadow: 0 6px 16px rgba(74, 111, 165, 0.6); }
+            50% { transform: rotate(-2deg); height: 7px; }
+            75% { transform: rotate(1deg); height: 7.5px; }
+            100% { transform: rotate(0deg); height: 8px; box-shadow: 0 4px 12px rgba(74, 111, 165, 0.4); }
+        }
+        .sample-body.fractured {
+            position: relative;
+            animation: fractureAnimation 1s ease-out;
+        }
+        @keyframes fractureAnimation {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 0.3; }
+        }
+        .sample-body.fractured::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: #e74c3c;
+            transform: translateX(-50%);
+        }
+        .stress-visualization {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(231,76,60,0) 0%, rgba(231,76,60,0.3) 50%, rgba(231,76,60,0) 100%);
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .stress-visualization.high {
+            background: linear-gradient(90deg, rgba(231,76,60,0.2) 0%, rgba(231,76,60,0.6) 50%, rgba(231,76,60,0.2) 100%);
+        }
+        .stress-visualization.medium {
+            background: linear-gradient(90deg, rgba(241,196,15,0.2) 0%, rgba(241,196,15,0.4) 50%, rgba(241,196,15,0.2) 100%);
+        }
+        .stress-visualization.low {
+            background: linear-gradient(90deg, rgba(52,152,219,0.2) 0%, rgba(52,152,219,0.4) 50%, rgba(52,152,219,0.2) 100%);
+        }
+        .force-indicator {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 40px; height: 40px; background: #e74c3c;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 12px;
+            animation: pulse 1s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.1); }
+        }
+        .force-indicator.left { left: -20px; }
+        .force-indicator.right { right: -20px; }
+        .force-indicator.top { top: -20px; left: 50%; transform: translateX(-50%); }
+        .force-indicator.bottom { bottom: -20px; left: 50%; transform: translateX(-50%); }
+        .chart-container {
+            margin-top: 20px; height: 200px;
+        }
+        .chart {
+            width: 100%; height: 100%; border: 2px solid #e3f2fd;
+            border-radius: 8px; position: relative;
+            background: linear-gradient(180deg, #f8f9fa 0%, #e3f2fd 100%);
+        }
+        .chart-line {
+            position: absolute; bottom: 20px; left: 20px;
+            width: calc(100% - 40px); height: 2px; background: #999;
+        }
+        .chart-axis {
+            position: absolute; bottom: 20px; left: 20px;
+            width: 2px; height: calc(100% - 40px); background: #999;
+        }
+        .stress-strain-curve {
+            position: absolute; bottom: 20px; left: 20px;
+            width: calc(100% - 40px); height: calc(100% - 40px);
+        }
+        .curve-path {
+            fill: none; stroke: #4a6fa5; stroke-width: 2;
+            stroke-linecap: round; stroke-linejoin: round;
+        }
+        .curve-dot {
+            fill: #e74c3c; stroke: #c0392b; stroke-width: 2;
+            r: 4;
+        }
+        .result-panel {
+            margin-top: 20px; padding: 20px; background: #e3f2fd;
+            border-radius: 10px; border-left: 4px solid #4a6fa5;
+        }
+        .result-title { color: #4a6fa5; font-weight: 600; margin-bottom: 10px; }
+        .result-content { color: #333; line-height: 1.6; }
+        .result-value { font-weight: 600; color: #27ae60; }
+        .result-warning { font-weight: 600; color: #e74c3c; }
+        
+        .result-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center;
+            align-items: center; backdrop-filter: blur(10px);
+        }
+        .modal-content {
+            background-color: white; padding: 50px; border-radius: 20px; max-width: 700px;
+            width: 90%; text-align: center; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+            border: 3px solid #4a6fa5; animation: modalAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalAppear {
+            0% { opacity: 0; transform: scale(0.8) translateY(50px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-title { color: #4a6fa5; margin-bottom: 20px; font-size: 2em; }
+        .modal-message { color: #666; font-size: 1.1em; margin-bottom: 30px; line-height: 1.6; }
+        .modal-buttons { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
+        
+        @media (max-width: 900px) {
+            .workspace, .experiment-content {
+                flex-direction: column;
+            }
+            .parts-container, .assembly-area, .experiment-controls, .experiment-visualization {
+                min-width: 100%;
+            }
+            .back-button { position: static; margin-bottom: 20px; }
+            .tabs { flex-direction: column; }
+            .tab-button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">← 返回首页</button>
+    
+    <div class="container">
+        <header>
+            <h1>🔧 机械学科 - 工程力学模拟实验</h1>
+            <p class="subtitle">专业工程力学实验模拟系统</p>
+        </header>
+        
+        <!-- 标签页 -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('equipment')">机械设备组装</button>
+            <button class="tab-button" onclick="switchTab('bending')">纯弯曲正应力分布</button>
+            <button class="tab-button" onclick="switchTab('stability')">压杆稳定实验</button>
+            <button class="tab-button" onclick="switchTab('dynamic')">动载荷与冲击</button>
+        </div>
+        
+        <!-- 机械设备组装 -->
+        <div class="tab-content active" id="equipment-tab">
+            <div class="equipment-selection">
+                <div class="selection-header">
+                    <h2>选择机械设备</h2>
+                    <p>请选择一种常见的机械设备进行组装学习</p>
+                </div>
+                <div class="equipment-options">
+                    <div class="equipment-option" data-equipment="engine">
+                        <div class="equipment-icon">🔧</div>
+                        <div class="equipment-name">发动机</div>
+                        <div class="equipment-description">汽车发动机的主要零部件组装，包括气缸、活塞、曲轴等</div>
+                    </div>
+                    <div class="equipment-option" data-equipment="gearbox">
+                        <div class="equipment-icon">⚙️</div>
+                        <div class="equipment-name">变速箱</div>
+                        <div class="equipment-description">汽车变速箱的组装，包括齿轮、离合器、换挡机构等</div>
+                    </div>
+                    <div class="equipment-option" data-equipment="pump">
+                        <div class="equipment-icon">💧</div>
+                        <div class="equipment-name">水泵</div>
+                        <div class="equipment-description">离心泵的组装，包括叶轮、泵体、轴承等</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="assembly-section" id="equipment-assembly">
+                <div class="assembly-header">
+                    <h2 class="assembly-title" id="equipment-title">机械设备组装</h2>
+                    <div class="assembly-controls">
+                        <button class="control-btn" onclick="resetEquipmentAssembly()">重置</button>
+                        <button class="control-btn primary" onclick="checkEquipmentAssembly()">检查组装</button>
+                    </div>
+                </div>
+                <div class="workspace">
+                    <div class="parts-container">
+                        <div class="parts-header">
+                            <h3>可用零件</h3>
+                        </div>
+                        <div class="parts-grid" id="equipment-parts">
+                            <!-- 零件将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                    <div class="assembly-area">
+                        <div class="equipment-frame" id="equipment-frame">
+                            <!-- 组装位置将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        
+        <!-- 纯弯曲正应力分布 -->
+        <div class="tab-content" id="bending-tab">
+            <div class="mechanics-experiment">
+                <div class="experiment-header">
+                    <h2>📐 纯弯曲正应力分布模拟</h2>
+                    <p>模拟梁在弯曲时上压下拉的应力分布，验证平截面假定</p>
+                </div>
+                <div class="experiment-content">
+                    <div class="experiment-controls">
+                        <div class="control-group">
+                            <label for="bending-material">选择材料</label>
+                            <select id="bending-material" onchange="updateBendingExperiment()">
+                                <option value="steel">钢材</option>
+                                <option value="aluminum">铝合金</option>
+                                <option value="wood">木材</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="bending-cross-section">截面形状</label>
+                            <select id="bending-cross-section" onchange="updateBendingExperiment()">
+                                <option value="rectangular">矩形</option>
+                                <option value="circular">圆形</option>
+                                <option value="i-beam">I型梁</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="bending-force">施加力 (kN)</label>
+                            <input type="range" id="bending-force" min="0" max="50" value="0" oninput="updateBendingExperiment()">
+                            <div class="range-value" id="bending-force-value">0 kN</div>
+                        </div>
+                        <button class="control-btn primary" onclick="runBendingTest()">开始实验</button>
+                    </div>
+                    <div class="experiment-visualization">
+                        <div class="visualization-container">
+                            <div class="visualization-area" id="bending-visualization">
+                                <div class="material-sample">
+                                    <div class="force-indicator top">F</div>
+                                    <div class="sample-body bending" id="bending-sample"></div>
+                                    <div class="force-indicator bottom">F</div>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart" id="bending-chart">
+                                    <div class="chart-line"></div>
+                                    <div class="chart-axis"></div>
+                                    <svg class="stress-strain-curve" id="bending-curve" viewBox="0 0 400 150">
+                                        <path class="curve-path" id="bending-curve-path" d="M0,150 L400,0"></path>
+                                        <circle class="curve-dot" id="bending-curve-dot" cx="0" cy="150"></circle>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="result-panel">
+                                <div class="result-title">实验结果</div>
+                                <div class="result-content" id="bending-result">
+                                    <p>选择材料并施加力来开始实验</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 压杆稳定实验 -->
+        <div class="tab-content" id="stability-tab">
+            <div class="mechanics-experiment">
+                <div class="experiment-header">
+                    <h2>🏋️ 压杆稳定模拟实验</h2>
+                    <p>不同长细比、约束条件下的临界压力模拟，观察失稳现象</p>
+                </div>
+                <div class="experiment-content">
+                    <div class="experiment-controls">
+                        <div class="control-group">
+                            <label for="stability-material">选择材料</label>
+                            <select id="stability-material" onchange="updateStabilityExperiment()">
+                                <option value="steel">钢材</option>
+                                <option value="aluminum">铝合金</option>
+                                <option value="wood">木材</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="stability-length">杆长 (mm)</label>
+                            <input type="number" id="stability-length" value="1000" min="500" max="3000" oninput="updateStabilityExperiment()">
+                        </div>
+                        <div class="control-group">
+                            <label for="stability-diameter">直径 (mm)</label>
+                            <input type="number" id="stability-diameter" value="20" min="10" max="50" oninput="updateStabilityExperiment()">
+                        </div>
+                        <div class="control-group">
+                            <label for="stability-constraint">约束条件</label>
+                            <select id="stability-constraint" onchange="updateStabilityExperiment()">
+                                <option value="pinned-pinned">两端铰支</option>
+                                <option value="fixed-fixed">两端固定</option>
+                                <option value="fixed-free">一端固定一端自由</option>
+                                <option value="fixed-pinned">一端固定一端铰支</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="stability-force">施加力 (kN)</label>
+                            <input type="range" id="stability-force" min="0" max="100" value="0" oninput="updateStabilityExperiment()">
+                            <div class="range-value" id="stability-force-value">0 kN</div>
+                        </div>
+                        <button class="control-btn primary" onclick="runStabilityTest()">开始实验</button>
+                    </div>
+                    <div class="experiment-visualization">
+                        <div class="visualization-container">
+                            <div class="visualization-area" id="stability-visualization">
+                                <div class="material-sample">
+                                    <div class="force-indicator top">F</div>
+                                    <div class="sample-body buckled" id="stability-sample"></div>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart" id="stability-chart">
+                                    <div class="chart-line"></div>
+                                    <div class="chart-axis"></div>
+                                    <svg class="stress-strain-curve" id="stability-curve" viewBox="0 0 400 150">
+                                        <path class="curve-path" id="stability-curve-path" d="M0,150 L400,0"></path>
+                                        <circle class="curve-dot" id="stability-curve-dot" cx="0" cy="150"></circle>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="result-panel">
+                                <div class="result-title">实验结果</div>
+                                <div class="result-content" id="stability-result">
+                                    <p>选择材料并施加力来开始实验</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 动载荷与冲击 -->
+        <div class="tab-content" id="dynamic-tab">
+            <div class="mechanics-experiment">
+                <div class="experiment-header">
+                    <h2>⚡ 动载荷与冲击模拟</h2>
+                    <p>自由落体冲击、交变载荷下的应力响应模拟</p>
+                </div>
+                <div class="experiment-content">
+                    <div class="experiment-controls">
+                        <div class="control-group">
+                            <label for="dynamic-material">选择材料</label>
+                            <select id="dynamic-material" onchange="updateDynamicExperiment()">
+                                <option value="steel">钢材</option>
+                                <option value="aluminum">铝合金</option>
+                                <option value="rubber">橡胶</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="dynamic-test-type">实验类型</label>
+                            <select id="dynamic-test-type" onchange="updateDynamicExperiment()">
+                                <option value="impact">自由落体冲击</option>
+                                <option value="cyclic">交变载荷</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="dynamic-height">冲击高度 (m)</label>
+                            <input type="number" id="dynamic-height" value="1" min="0.1" max="10" step="0.1" oninput="updateDynamicExperiment()">
+                        </div>
+                        <div class="control-group">
+                            <label for="dynamic-mass">冲击质量 (kg)</label>
+                            <input type="number" id="dynamic-mass" value="1" min="0.1" max="10" step="0.1" oninput="updateDynamicExperiment()">
+                        </div>
+                        <div class="control-group">
+                            <label for="dynamic-frequency">载荷频率 (Hz)</label>
+                            <input type="number" id="dynamic-frequency" value="10" min="1" max="100" oninput="updateDynamicExperiment()">
+                        </div>
+                        <button class="control-btn primary" onclick="runDynamicTest()">开始实验</button>
+                    </div>
+                    <div class="experiment-visualization">
+                        <div class="visualization-container">
+                            <div class="visualization-area" id="dynamic-visualization">
+                                <div class="material-sample">
+                                    <div class="force-indicator top">⬇️</div>
+                                    <div class="sample-body" id="dynamic-sample"></div>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart" id="dynamic-chart">
+                                    <div class="chart-line"></div>
+                                    <div class="chart-axis"></div>
+                                    <svg class="stress-strain-curve" id="dynamic-curve" viewBox="0 0 400 150">
+                                        <path class="curve-path" id="dynamic-curve-path" d="M0,75 L400,75"></path>
+                                        <circle class="curve-dot" id="dynamic-curve-dot" cx="0" cy="75"></circle>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="result-panel">
+                                <div class="result-title">实验结果</div>
+                                <div class="result-content" id="dynamic-result">
+                                    <p>选择材料并设置参数来开始实验</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果模态框 -->
+    <div class="result-modal" id="result-modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modal-title">组装结果</h2>
+            <p class="modal-message" id="modal-message"></p>
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeModal()">关闭</button>
+                <button class="control-btn primary" onclick="resetEquipmentAssembly()">重新组装</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 设备数据
+        const equipmentData = {
+            engine: {
+                name: '发动机',
+                parts: [
+                    { id: 'cylinder', name: '气缸', icon: '🔩', position: 'center' },
+                    { id: 'piston', name: '活塞', icon: '⚙️', position: 'top' },
+                    { id: 'crankshaft', name: '曲轴', icon: '🔄', position: 'bottom' },
+                    { id: 'spark-plug', name: '火花塞', icon: '⚡', position: 'top-right' },
+                    { id: 'fuel-injector', name: '喷油嘴', icon: '💉', position: 'top-left' }
+                ],
+                positions: [
+                    { id: 'center', x: '50%', y: '50%' },
+                    { id: 'top', x: '50%', y: '20%' },
+                    { id: 'bottom', x: '50%', y: '80%' },
+                    { id: 'top-right', x: '80%', y: '20%' },
+                    { id: 'top-left', x: '20%', y: '20%' }
+                ]
+            },
+            gearbox: {
+                name: '变速箱',
+                parts: [
+                    { id: 'gears', name: '齿轮组', icon: '⚙️', position: 'center' },
+                    { id: 'clutch', name: '离合器', icon: '🔗', position: 'left' },
+                    { id: 'shift-lever', name: '换挡杆', icon: '🚗', position: 'right' },
+                    { id: 'input-shaft', name: '输入轴', icon: '🔄', position: 'top' },
+                    { id: 'output-shaft', name: '输出轴', icon: '🔄', position: 'bottom' }
+                ],
+                positions: [
+                    { id: 'center', x: '50%', y: '50%' },
+                    { id: 'left', x: '20%', y: '50%' },
+                    { id: 'right', x: '80%', y: '50%' },
+                    { id: 'top', x: '50%', y: '20%' },
+                    { id: 'bottom', x: '50%', y: '80%' }
+                ]
+            },
+            pump: {
+                name: '水泵',
+                parts: [
+                    { id: 'impeller', name: '叶轮', icon: '🔄', position: 'center' },
+                    { id: 'pump-body', name: '泵体', icon: '📦', position: 'outer' },
+                    { id: 'shaft', name: '轴', icon: '🔄', position: 'left' },
+                    { id: 'bearing', name: '轴承', icon: '⚙️', position: 'left-center' },
+                    { id: 'seal', name: '密封件', icon: '🔒', position: 'left-inner' }
+                ],
+                positions: [
+                    { id: 'center', x: '50%', y: '50%' },
+                    { id: 'outer', x: '50%', y: '50%' },
+                    { id: 'left', x: '20%', y: '50%' },
+                    { id: 'left-center', x: '35%', y: '50%' },
+                    { id: 'left-inner', x: '45%', y: '50%' }
+                ]
+            }
+        };
+
+        // 材料数据（基于真实材料特性）
+        const materialData = {
+            'low-carbon-steel': {
+                name: '低碳钢',
+                youngsModulus: 200,
+                yieldStrength: 250,
+                ultimateStrength: 400,
+                fractureStrain: 0.25,
+                color: '#4a6fa5'
+            },
+            'cast-iron': {
+                name: '铸铁',
+                youngsModulus: 180,
+                yieldStrength: 170,
+                ultimateStrength: 250,
+                fractureStrain: 0.005,
+                color: '#7f8c8d'
+            },
+            'aluminum': {
+                name: '铝合金',
+                youngsModulus: 70,
+                yieldStrength: 150,
+                ultimateStrength: 250,
+                fractureStrain: 0.15,
+                color: '#e67e22'
+            },
+            'copper': {
+                name: '铜合金',
+                youngsModulus: 110,
+                yieldStrength: 70,
+                ultimateStrength: 220,
+                fractureStrain: 0.45,
+                color: '#d35400'
+            },
+            'steel': {
+                name: '钢材',
+                youngsModulus: 200,
+                yieldStrength: 250,
+                ultimateStrength: 400,
+                fractureStrain: 0.25,
+                color: '#4a6fa5'
+            },
+            'brass': {
+                name: '黄铜',
+                youngsModulus: 90,
+                yieldStrength: 120,
+                ultimateStrength: 300,
+                fractureStrain: 0.35,
+                color: '#f39c12'
+            },
+            'wood': {
+                name: '木材',
+                youngsModulus: 10,
+                yieldStrength: 30,
+                ultimateStrength: 50,
+                fractureStrain: 0.01,
+                color: '#8b4513'
+            },
+            'rubber': {
+                name: '橡胶',
+                youngsModulus: 0.01,
+                yieldStrength: 20,
+                ultimateStrength: 30,
+                fractureStrain: 5.0,
+                color: '#27ae60'
+            }
+        };
+
+        let selectedEquipment = null;
+        let currentAssembly = {};
+
+        // DOM元素
+        const equipmentTab = document.getElementById('equipment-tab');
+        const equipmentTitle = document.getElementById('equipment-title');
+        const equipmentParts = document.getElementById('equipment-parts');
+        const equipmentFrame = document.getElementById('equipment-frame');
+        const resultModal = document.getElementById('result-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+
+        // 初始化
+        function init() {
+            // 添加设备选择事件
+            document.querySelectorAll('.equipment-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    selectEquipment(option.dataset.equipment);
+                });
+            });
+            
+            // 初始化力学实验
+            initMechanicsExperiments();
+        }
+
+        // 切换标签页
+        function switchTab(tab) {
+            // 重置所有标签和内容
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 激活选中的标签
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}-tab`).classList.add('active');
+        }
+
+        // 选择设备
+        function selectEquipment(equipmentType) {
+            selectedEquipment = equipmentType;
+            
+            // 更新UI
+            document.querySelectorAll('.equipment-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector(`[data-equipment="${equipmentType}"]`).classList.add('selected');
+            
+            // 更新标题
+            equipmentTitle.textContent = equipmentData[equipmentType].name + ' 组装';
+            
+            // 初始化组装
+            initEquipmentAssembly();
+        }
+
+        // 初始化设备组装
+        function initEquipmentAssembly() {
+            if (!selectedEquipment) return;
+            
+            const equipment = equipmentData[selectedEquipment];
+            
+            // 清空零件和组装区域
+            equipmentParts.innerHTML = '';
+            equipmentFrame.innerHTML = '';
+            currentAssembly = {};
+            
+            // 创建设备模型
+            const modelElement = document.createElement('div');
+            modelElement.className = `equipment-model ${selectedEquipment}-model`;
+            equipmentFrame.appendChild(modelElement);
+            
+            // 生成零件
+            equipment.parts.forEach(part => {
+                const partElement = document.createElement('div');
+                partElement.id = part.id;
+                partElement.className = 'part';
+                partElement.dataset.partId = part.id;
+                partElement.dataset.correctPosition = part.position;
+                partElement.innerHTML = `
+                    <div class="part-icon">${part.icon}</div>
+                    <div class="part-name">${part.name}</div>
+                `;
+                
+                // 添加拖拽事件
+                partElement.addEventListener('mousedown', startDrag);
+                equipmentParts.appendChild(partElement);
+            });
+            
+            // 生成组装位置
+            equipment.positions.forEach(position => {
+                const positionElement = document.createElement('div');
+                positionElement.id = `position-${position.id}`;
+                positionElement.className = 'assembly-position';
+                positionElement.dataset.positionId = position.id;
+                positionElement.style.left = position.x;
+                positionElement.style.top = position.y;
+                positionElement.style.transform = 'translate(-50%, -50%)';
+                
+                // 添加放置事件
+                positionElement.addEventListener('dragover', allowDrop);
+                positionElement.addEventListener('drop', dropPart);
+                
+                // 添加位置提示
+                const positionHint = document.createElement('div');
+                positionHint.className = 'position-hint';
+                positionHint.style.position = 'absolute';
+                positionHint.style.bottom = '-25px';
+                positionHint.style.left = '50%';
+                positionHint.style.transform = 'translateX(-50%)';
+                positionHint.style.fontSize = '12px';
+                positionHint.style.color = '#4a6fa5';
+                positionHint.style.fontWeight = '600';
+                positionHint.style.whiteSpace = 'nowrap';
+                
+                // 根据位置设置提示文字
+                const positionNames = {
+                    'center': '气缸/齿轮组/叶轮',
+                    'top': '活塞/输入轴',
+                    'bottom': '曲轴/输出轴',
+                    'top-right': '火花塞',
+                    'top-left': '喷油嘴',
+                    'left': '离合器/轴',
+                    'right': '换挡杆',
+                    'outer': '泵体',
+                    'left-center': '轴承',
+                    'left-inner': '密封件'
+                };
+                
+                if (positionNames[position.id]) {
+                    positionHint.textContent = positionNames[position.id];
+                    positionElement.appendChild(positionHint);
+                }
+                
+                equipmentFrame.appendChild(positionElement);
+            });
+        }
+
+        // 开始拖拽
+        function startDrag(e) {
+            const part = e.target.closest('.part');
+            if (!part) return;
+            
+            part.classList.add('dragging');
+            
+            function onMouseMove(e) {
+                part.style.position = 'fixed';
+                part.style.left = (e.clientX - 50) + 'px';
+                part.style.top = (e.clientY - 50) + 'px';
+                part.style.zIndex = '100';
+            }
+            
+            function onMouseUp(e) {
+                part.classList.remove('dragging');
+                part.style.position = '';
+                part.style.left = '';
+                part.style.top = '';
+                part.style.zIndex = '';
+                
+                const position = document.elementFromPoint(e.clientX, e.clientY).closest('.assembly-position');
+                if (position) {
+                    dropPart({ target: position, dataTransfer: { getData: () => part.dataset.partId } });
+                }
+                
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+            
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        }
+
+        // 允许放置
+        function allowDrop(e) {
+            e.preventDefault();
+        }
+
+        // 放置零件
+        function dropPart(e) {
+            e.preventDefault();
+            const position = e.target.closest('.assembly-position');
+            if (!position) return;
+            
+            const partId = e.dataTransfer ? e.dataTransfer.getData('text') : e.dataTransfer.getData();
+            const part = document.getElementById(partId);
+            if (!part) return;
+            
+            // 检查是否已放置
+            const existingPart = position.querySelector('.part');
+            if (existingPart) {
+                // 移除现有零件
+                equipmentParts.appendChild(existingPart);
+                delete currentAssembly[position.dataset.positionId];
+            }
+            
+            // 移动零件到位置
+            position.appendChild(part);
+            position.classList.add('filled');
+            
+            // 记录组装
+            currentAssembly[position.dataset.positionId] = partId;
+            
+            // 检查是否正确
+            const correctPosition = part.dataset.correctPosition;
+            if (correctPosition === position.dataset.positionId) {
+                position.classList.remove('wrong');
+            } else {
+                position.classList.add('wrong');
+            }
+        }
+
+        // 检查设备组装
+        function checkEquipmentAssembly() {
+            if (!selectedEquipment) return;
+            
+            const equipment = equipmentData[selectedEquipment];
+            let correct = 0;
+            let wrong = 0;
+            
+            // 检查每个位置
+            equipment.positions.forEach(position => {
+                const partId = currentAssembly[position.id];
+                if (partId) {
+                    const part = document.getElementById(partId);
+                    if (part.dataset.correctPosition === position.id) {
+                        correct++;
+                        document.getElementById(`position-${position.id}`).classList.remove('wrong');
+                        document.getElementById(`position-${position.id}`).classList.add('filled');
+                    } else {
+                        wrong++;
+                        document.getElementById(`position-${position.id}`).classList.add('wrong');
+                    }
+                }
+            });
+            
+            // 更新模态框
+            if (correct === equipment.parts.length) {
+                modalTitle.textContent = '组装成功！';
+                modalMessage.textContent = `恭喜你成功组装了${equipment.name}，所有零件都放置在正确的位置。`;
+            } else {
+                modalTitle.textContent = '组装结果';
+                modalMessage.textContent = `你正确组装了${correct}个零件，错误放置了${wrong}个零件。请检查并重新组装。`;
+            }
+            
+            // 显示模态框
+            resultModal.style.display = 'flex';
+        }
+
+        // 重置设备组装
+        function resetEquipmentAssembly() {
+            initEquipmentAssembly();
+            closeModal();
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            resultModal.style.display = 'none';
+        }
+
+        // 初始化力学实验
+        function initMechanicsExperiments() {
+            
+            // 初始化弯曲实验
+            document.getElementById('bending-force').addEventListener('input', function() {
+                document.getElementById('bending-force-value').textContent = this.value + ' kN';
+                updateBendingExperiment();
+            });
+            
+            // 初始化压杆稳定实验
+            document.getElementById('stability-force').addEventListener('input', function() {
+                document.getElementById('stability-force-value').textContent = this.value + ' kN';
+                updateStabilityExperiment();
+            });
+        }
+
+
+
+
+
+        // 更新拉伸实验结果
+        function updateTensionResult(materialInfo, force, position, angle, stress, strain) {
+            const result = document.getElementById('tension-result');
+            
+            let content = `<p><strong>材料：</strong>${materialInfo.name}</p>`;
+            content += `<p><strong>施加力：</strong>${force} kN</p>`;
+            content += `<p><strong>施加位置：</strong>${getPositionName(position)}</p>`;
+            content += `<p><strong>施加角度：</strong>${angle}°</p>`;
+            
+            if (force > 0) {
+                content += `<p><strong>应力：</strong><span class="result-value">${stress.toFixed(2)} MPa</span></p>`;
+                content += `<p><strong>应变：</strong><span class="result-value">${strain.toFixed(3)}</span></p>`;
+                
+                if (stress < materialInfo.yieldStrength) {
+                    content += `<p><strong>状态：</strong><span class="result-value">弹性阶段</span></p>`;
+                    content += `<p><strong>说明：</strong>材料处于弹性变形阶段，卸载后会完全恢复</p>`;
+                } else if (stress < materialInfo.ultimateStrength) {
+                    content += `<p><strong>状态：</strong><span class="result-warning">屈服阶段</span></p>`;
+                    content += `<p><strong>说明：</strong>材料开始产生塑性变形，卸载后不会完全恢复</p>`;
+                } else {
+                    content += `<p><strong>状态：</strong><span class="result-warning">颈缩/断裂阶段</span></p>`;
+                    content += `<p><strong>说明：</strong>材料开始颈缩，截面积减小，最终会断裂</p>`;
+                }
+            }
+            
+            result.innerHTML = content;
+        }
+
+
+
+        // 更新弯曲实验
+        function updateBendingExperiment() {
+            const material = document.getElementById('bending-material').value;
+            const crossSection = document.getElementById('bending-cross-section').value;
+            const force = parseInt(document.getElementById('bending-force').value);
+            
+            const materialInfo = materialData[material];
+            const sample = document.getElementById('bending-sample');
+            const curvePath = document.getElementById('bending-curve-path');
+            const curveDot = document.getElementById('bending-curve-dot');
+            const result = document.getElementById('bending-result');
+            
+            // 更新样本外观
+            sample.style.background = `linear-gradient(145deg, ${materialInfo.color}, ${adjustColor(materialInfo.color, -30)})`;
+            
+            // 计算应力
+            const stress = (force / 50) * 50; // 简化计算
+            
+            // 更新样本变形
+            if (force > 0) {
+                sample.classList.add('bending');
+                
+                // 添加应力可视化（弯曲应力分布）
+                addStressVisualization(sample, stress, materialInfo, 'bending');
+            } else {
+                sample.classList.remove('bending');
+                
+                // 移除应力可视化
+                removeStressVisualization(sample);
+            }
+            
+            // 生成应力-应变曲线
+            const strain = (force / 50) * 0.5;
+            generateStressStrainCurve(curvePath, curveDot, materialInfo, strain);
+            
+            // 更新结果
+            updateBendingResult(materialInfo, force, crossSection, stress);
+        }
+
+        // 运行弯曲实验
+        function runBendingTest() {
+            const material = document.getElementById('bending-material').value;
+            const materialInfo = materialData[material];
+            const force = parseInt(document.getElementById('bending-force').value);
+            
+            let message = `材料：${materialInfo.name}\n`;
+            message += `施加力：${force} kN\n`;
+            
+            if (force === 0) {
+                message += '请施加力来进行实验';
+            } else {
+                message += '观察到梁的弯曲现象，应力分布符合平截面假定';
+            }
+            
+            alert(message);
+        }
+
+        // 更新弯曲实验结果
+        function updateBendingResult(materialInfo, force, crossSection) {
+            const result = document.getElementById('bending-result');
+            
+            let content = `<p><strong>材料：</strong>${materialInfo.name}</p>`;
+            content += `<p><strong>截面形状：</strong>${getCrossSectionName(crossSection)}</p>`;
+            content += `<p><strong>施加力：</strong>${force} kN</p>`;
+            
+            if (force > 0) {
+                const stress = (force / 50) * 50; // 简化计算
+                content += `<p><strong>最大正应力：</strong><span class="result-value">${stress.toFixed(2)} MPa</span></p>`;
+            }
+            
+            result.innerHTML = content;
+        }
+
+        // 更新压杆稳定实验
+        function updateStabilityExperiment() {
+            const material = document.getElementById('stability-material').value;
+            const length = parseInt(document.getElementById('stability-length').value);
+            const diameter = parseInt(document.getElementById('stability-diameter').value);
+            const constraint = document.getElementById('stability-constraint').value;
+            const force = parseInt(document.getElementById('stability-force').value);
+            
+            const materialInfo = materialData[material];
+            const sample = document.getElementById('stability-sample');
+            const curvePath = document.getElementById('stability-curve-path');
+            const curveDot = document.getElementById('stability-curve-dot');
+            const result = document.getElementById('stability-result');
+            
+            // 更新样本外观
+            sample.style.background = `linear-gradient(145deg, ${materialInfo.color}, ${adjustColor(materialInfo.color, -30)})`;
+            
+            // 计算长细比
+            const slendernessRatio = calculateSlendernessRatio(length, diameter, constraint);
+            
+            // 更新结果
+            updateStabilityResult(materialInfo, force, length, diameter, constraint, slendernessRatio);
+        }
+
+        // 运行压杆稳定实验
+        function runStabilityTest() {
+            const material = document.getElementById('stability-material').value;
+            const materialInfo = materialData[material];
+            const force = parseInt(document.getElementById('stability-force').value);
+            const length = parseInt(document.getElementById('stability-length').value);
+            const diameter = parseInt(document.getElementById('stability-diameter').value);
+            const constraint = document.getElementById('stability-constraint').value;
+            
+            const slendernessRatio = calculateSlendernessRatio(length, diameter, constraint);
+            const criticalForce = calculateCriticalForce(materialInfo, length, diameter, constraint);
+            
+            let message = `材料：${materialInfo.name}\n`;
+            message += `长细比：${slendernessRatio.toFixed(2)}\n`;
+            message += `临界压力：${criticalForce.toFixed(2)} kN\n`;
+            message += `施加力：${force} kN\n`;
+            
+            if (force === 0) {
+                message += '请施加力来进行实验';
+            } else if (force < criticalForce * 0.8) {
+                message += '压杆处于稳定状态，未达到临界压力';
+            } else if (force < criticalForce * 1.2) {
+                message += '压杆接近临界状态，即将失稳';
+            } else {
+                message += '压杆已失稳，实验结束';
+            }
+            
+            alert(message);
+        }
+
+        // 更新压杆稳定实验结果
+        function updateStabilityResult(materialInfo, force, length, diameter, constraint, slendernessRatio) {
+            const result = document.getElementById('stability-result');
+            const criticalForce = calculateCriticalForce(materialInfo, length, diameter, constraint);
+            
+            let content = `<p><strong>材料：</strong>${materialInfo.name}</p>`;
+            content += `<p><strong>杆长：</strong>${length} mm</p>`;
+            content += `<p><strong>直径：</strong>${diameter} mm</p>`;
+            content += `<p><strong>约束条件：</strong>${getConstraintName(constraint)}</p>`;
+            content += `<p><strong>长细比：</strong><span class="result-value">${slendernessRatio.toFixed(2)}</span></p>`;
+            content += `<p><strong>临界压力：</strong><span class="result-value">${criticalForce.toFixed(2)} kN</span></p>`;
+            content += `<p><strong>施加力：</strong>${force} kN</p>`;
+            
+            if (force > 0) {
+                if (force < criticalForce * 0.8) {
+                    content += `<p><strong>状态：</strong><span class="result-value">稳定</span></p>`;
+                } else if (force < criticalForce * 1.2) {
+                    content += `<p><strong>状态：</strong><span class="result-warning">临界</span></p>`;
+                } else {
+                    content += `<p><strong>状态：</strong><span class="result-warning">失稳</span></p>`;
+                }
+            }
+            
+            result.innerHTML = content;
+        }
+
+        // 更新动载荷与冲击实验
+        function updateDynamicExperiment() {
+            const material = document.getElementById('dynamic-material').value;
+            const testType = document.getElementById('dynamic-test-type').value;
+            const height = parseFloat(document.getElementById('dynamic-height').value);
+            const mass = parseFloat(document.getElementById('dynamic-mass').value);
+            const frequency = parseInt(document.getElementById('dynamic-frequency').value);
+            
+            const materialInfo = materialData[material];
+            const sample = document.getElementById('dynamic-sample');
+            const curvePath = document.getElementById('dynamic-curve-path');
+            const curveDot = document.getElementById('dynamic-curve-dot');
+            const result = document.getElementById('dynamic-result');
+            
+            // 更新样本外观
+            sample.style.background = `linear-gradient(145deg, ${materialInfo.color}, ${adjustColor(materialInfo.color, -30)})`;
+            
+            // 生成动态载荷曲线
+            generateDynamicLoadCurve(curvePath, testType, frequency);
+            
+            // 更新结果
+            updateDynamicResult(materialInfo, testType, height, mass, frequency);
+        }
+
+        // 运行动载荷与冲击实验
+        function runDynamicTest() {
+            const material = document.getElementById('dynamic-material').value;
+            const materialInfo = materialData[material];
+            const testType = document.getElementById('dynamic-test-type').value;
+            const height = parseFloat(document.getElementById('dynamic-height').value);
+            const mass = parseFloat(document.getElementById('dynamic-mass').value);
+            
+            let message = `材料：${materialInfo.name}\n`;
+            
+            if (testType === 'impact') {
+                const impactEnergy = mass * 9.81 * height;
+                message += `冲击高度：${height} m\n`;
+                message += `冲击质量：${mass} kg\n`;
+                message += `冲击能量：${impactEnergy.toFixed(2)} J\n`;
+                message += '观察到材料的冲击响应';
+            } else {
+                message += '观察到材料在交变载荷下的应力响应';
+            }
+            
+            alert(message);
+        }
+
+        // 更新动载荷与冲击实验结果
+        function updateDynamicResult(materialInfo, testType, height, mass, frequency) {
+            const result = document.getElementById('dynamic-result');
+            
+            let content = `<p><strong>材料：</strong>${materialInfo.name}</p>`;
+            content += `<p><strong>实验类型：</strong>${testType === 'impact' ? '自由落体冲击' : '交变载荷'}</p>`;
+            
+            if (testType === 'impact') {
+                const impactEnergy = mass * 9.81 * height;
+                content += `<p><strong>冲击高度：</strong>${height} m</p>`;
+                content += `<p><strong>冲击质量：</strong>${mass} kg</p>`;
+                content += `<p><strong>冲击能量：</strong><span class="result-value">${impactEnergy.toFixed(2)} J</span></p>`;
+            } else {
+                content += `<p><strong>载荷频率：</strong>${frequency} Hz</p>`;
+            }
+            
+            result.innerHTML = content;
+        }
+
+        // 生成应力-应变曲线
+        function generateStressStrainCurve(curvePath, curveDot, materialInfo, strain) {
+            const maxStrain = materialInfo.fractureStrain;
+            const yieldStrain = materialInfo.yieldStrength / materialInfo.youngsModulus;
+            const ultimateStrain = maxStrain * 0.8;
+            
+            let path = `M0,150 `;
+            
+            // 弹性阶段
+            const elasticEndX = (yieldStrain / maxStrain) * 400;
+            const elasticEndY = 150 - (yieldStrain / maxStrain) * 150;
+            path += `L${elasticEndX},${elasticEndY} `;
+            
+            // 屈服阶段
+            const yieldEndX = (ultimateStrain / maxStrain) * 300;
+            path += `L${yieldEndX},${elasticEndY - 20} `;
+            
+            // 强化阶段
+            const ultimateX = (ultimateStrain / maxStrain) * 350;
+            const ultimateY = 30;
+            path += `L${ultimateX},${ultimateY} `;
+            
+            // 颈缩阶段
+            path += `L400,150`;
+            
+            curvePath.setAttribute('d', path);
+            
+            // 更新当前点
+            const currentX = (strain / maxStrain) * 400;
+            const currentY = 150 - (strain / maxStrain) * 150;
+            curveDot.setAttribute('cx', Math.min(currentX, 400));
+            curveDot.setAttribute('cy', Math.max(currentY, 0));
+        }
+
+        // 生成扭矩-转角曲线
+        function generateTorqueAngleCurve(curvePath, curveDot, torque, angle) {
+            let path = `M0,150 `;
+            
+            // 线性关系
+            const endX = Math.min((torque / 500) * 400, 400);
+            const endY = 150 - (angle / 90) * 150;
+            path += `L${endX},${endY}`;
+            
+            curvePath.setAttribute('d', path);
+            curveDot.setAttribute('cx', endX);
+            curveDot.setAttribute('cy', endY);
+        }
+
+        // 生成动态载荷曲线
+        function generateDynamicLoadCurve(curvePath, testType, frequency) {
+            let path = `M0,75 `;
+            
+            if (testType === 'cyclic') {
+                // 正弦曲线
+                const points = 100;
+                for (let i = 1; i <= points; i++) {
+                    const x = (i / points) * 400;
+                    const y = 75 + Math.sin((i / points) * frequency * 2 * Math.PI) * 50;
+                    path += `L${x},${y} `;
+                }
+            } else {
+                // 冲击曲线
+                path += `L100,75 L150,25 L200,75 L400,75`;
+            }
+            
+            curvePath.setAttribute('d', path);
+        }
+
+        // 计算长细比
+        function calculateSlendernessRatio(length, diameter, constraint) {
+            const radius = diameter / 2;
+            const inertiaRadius = radius / 2;
+            const effectiveLength = getEffectiveLength(length, constraint);
+            return effectiveLength / inertiaRadius;
+        }
+
+        // 计算临界压力
+        function calculateCriticalForce(materialInfo, length, diameter, constraint) {
+            const youngsModulus = materialInfo.youngsModulus * 1e9;
+            const inertia = Math.PI * Math.pow(diameter/2, 4) / 4;
+            const effectiveLength = getEffectiveLength(length, constraint);
+            return (Math.PI * Math.PI * youngsModulus * inertia) / (effectiveLength * effectiveLength) / 1000;
+        }
+
+        // 获取有效长度
+        function getEffectiveLength(length, constraint) {
+            const factors = {
+                'pinned-pinned': 1.0,
+                'fixed-fixed': 0.5,
+                'fixed-free': 2.0,
+                'fixed-pinned': 0.7
+            };
+            return length * factors[constraint] / 1000;
+        }
+
+        // 获取约束条件名称
+        function getConstraintName(constraint) {
+            const names = {
+                'pinned-pinned': '两端铰支',
+                'fixed-fixed': '两端固定',
+                'fixed-free': '一端固定一端自由',
+                'fixed-pinned': '一端固定一端铰支'
+            };
+            return names[constraint];
+        }
+
+        // 获取截面形状名称
+        function getCrossSectionName(crossSection) {
+            const names = {
+                'rectangular': '矩形',
+                'circular': '圆形',
+                'i-beam': 'I型梁'
+            };
+            return names[crossSection];
+        }
+
+        // 调整颜色亮度
+        function adjustColor(color, amount) {
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            
+            const newR = Math.max(0, Math.min(255, r + amount));
+            const newG = Math.max(0, Math.min(255, g + amount));
+            const newB = Math.max(0, Math.min(255, b + amount));
+            
+            return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+        }
+
+        // 添加应力可视化
+        function addStressVisualization(sample, stress, materialInfo, type = 'tension') {
+            // 移除现有的应力可视化
+            removeStressVisualization(sample);
+            
+            // 创建应力可视化元素
+            const stressVis = document.createElement('div');
+            stressVis.className = 'stress-visualization';
+            
+            // 根据应力大小设置颜色强度
+            if (stress > materialInfo.ultimateStrength) {
+                stressVis.classList.add('high');
+            } else if (stress > materialInfo.yieldStrength) {
+                stressVis.classList.add('medium');
+            } else {
+                stressVis.classList.add('low');
+            }
+            
+            // 根据实验类型和施加位置设置不同的应力分布
+            if (type === 'bending') {
+                stressVis.style.background = 'linear-gradient(180deg, rgba(231,76,60,0.4) 0%, rgba(52,152,219,0.4) 50%, rgba(231,76,60,0.4) 100%)';
+            } else if (type === 'torsion') {
+                stressVis.style.background = 'radial-gradient(circle, rgba(231,76,60,0.4) 0%, rgba(52,152,219,0.4) 70%)';
+            } else if (type === 'end') {
+                // 端部施加力的应力分布
+                stressVis.style.background = 'linear-gradient(90deg, rgba(231,76,60,0.6) 0%, rgba(241,196,15,0.4) 50%, rgba(52,152,219,0.2) 100%)';
+            } else if (type === 'offset') {
+                // 偏移施加力的应力分布
+                stressVis.style.background = 'linear-gradient(90deg, rgba(52,152,219,0.2) 0%, rgba(241,196,15,0.4) 30%, rgba(231,76,60,0.6) 70%, rgba(52,152,219,0.2) 100%)';
+            } else {
+                // 中心施加力的应力分布
+                stressVis.style.background = 'linear-gradient(90deg, rgba(52,152,219,0.2) 0%, rgba(231,76,60,0.4) 50%, rgba(52,152,219,0.2) 100%)';
+            }
+            
+            sample.appendChild(stressVis);
+        }
+
+        // 移除应力可视化
+        function removeStressVisualization(sample) {
+            const existingVis = sample.querySelector('.stress-visualization');
+            if (existingVis) {
+                existingVis.remove();
+            }
+        }
+
+
+
+
+
+        // 更新弯曲实验结果
+        function updateBendingResult(materialInfo, force, crossSection, stress) {
+            const result = document.getElementById('bending-result');
+            
+            let content = `<p><strong>材料：</strong>${materialInfo.name}</p>`;
+            content += `<p><strong>截面形状：</strong>${getCrossSectionName(crossSection)}</p>`;
+            content += `<p><strong>施加力：</strong>${force} kN</p>`;
+            
+            if (force > 0) {
+                content += `<p><strong>最大正应力：</strong><span class="result-value">${stress.toFixed(2)} MPa</span></p>`;
+                content += `<p><strong>说明：</strong>梁弯曲时，上表面受压，下表面受拉，中性层应力为零</p>`;
+            }
+            
+            result.innerHTML = content;
+        }
+
+        // 初始化应用
+        init();
+    </script>
+</body>
+</html>

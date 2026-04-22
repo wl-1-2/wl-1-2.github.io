@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学科模拟学习平台</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            position: relative;
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #3a506b, #1c2541);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info span {
+            font-size: 14px;
+        }
+        
+        .login-btn, .logout-btn, .panel-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .login-btn {
+            background: #3498db;
+            color: white;
+        }
+        
+        .login-btn:hover {
+            background: #2980b9;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        .panel-btn {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .panel-btn:hover {
+            background: #e67e22;
+        }
+        
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .role-student {
+            background: #27ae60;
+        }
+        
+        .role-teacher {
+            background: #f39c12;
+        }
+        
+        .role-admin {
+            background: #e74c3c;
+        }
+        
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .module-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            border-color: #3a506b;
+        }
+        
+        .module-icon {
+            font-size: 4em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .module-title {
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #3a506b;
+        }
+        
+        .module-description {
+            text-align: center;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #3a506b;
+            color: white;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .module-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="user-info" id="user-info">
+                <button class="login-btn" onclick="window.location.href='login.html'">登录</button>
+            </div>
+            <h1>学科模拟学习平台</h1>
+            <p class="subtitle">通过互动模拟实验，提升专业技能</p>
+        </header>
+        
+        <div class="modules-grid">
+            <!-- 计算机相关学科 -->
+            <div class="module-card" onclick="window.location.href='computer.html'">
+                <div class="module-icon">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=computer%20hardware%20assembly%20components%20motherboard%20cpu%20ram%20realistic%20photo&image_size=square_hd" alt="计算机硬件" style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px;">
+                </div>
+                <h2 class="module-title">计算机相关学科</h2>
+                <p class="module-description">模拟计算机组装实验，学习硬件知识</p>
+            </div>
+            
+            <!-- 大数据学科 -->
+            <div class="module-card" onclick="window.location.href='bigdata.html'">
+                <div class="module-icon">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=live%20streaming%20room%20ecommerce%20shopping%20realistic%20photo&image_size=square_hd" alt="直播电商" style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px;">
+                </div>
+                <h2 class="module-title">大数据学科</h2>
+                <p class="module-description">虚拟直播间，模拟电商运营</p>
+            </div>
+            
+            <!-- 无人机学科 -->
+            <div class="module-card" onclick="window.location.href='drone.html'">
+                <div class="module-icon">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=drone%20assembly%20parts%20quadcopter%20realistic%20photo&image_size=square_hd" alt="无人机" style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px;">
+                </div>
+                <h2 class="module-title">无人机学科</h2>
+                <p class="module-description">无人机组装模拟，学习飞行器结构</p>
+            </div>
+            
+            <!-- 机械学科 -->
+            <div class="module-card" onclick="window.location.href='mechanical.html'">
+                <div class="module-icon">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mechanical%20equipment%20assembly%20tools%20realistic%20photo&image_size=square_hd" alt="机械装备" style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px;">
+                </div>
+                <h2 class="module-title">机械学科</h2>
+                <p class="module-description">机械设备组装和电路搭建模拟</p>
+            </div>
+            
+            <!-- 城市规划设计 -->
+            <div class="module-card" onclick="window.location.href='transportation.html'">
+                <div class="module-icon">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=city%20planning%20urban%20railway%20design%20realistic%20photo&image_size=square_hd" alt="城市轨道规划" style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px;">
+                </div>
+                <h2 class="module-title">城市规划设计</h2>
+                <p class="module-description">城市轨道规划设计</p>
+            </div>
+            
+            <!-- 物联网 -->
+            <div class="module-card" onclick="window.location.href='iot.html'">
+                <div class="module-icon">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=smart%20home%20automation%20devices%20realistic%20photo&image_size=square_hd" alt="智能家居" style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px;">
+                </div>
+                <h2 class="module-title">物联网</h2>
+                <p class="module-description">全屋智能家居设计模拟</p>
+            </div>
+            
+            <!-- 医护专业 -->
+            <div class="module-card" onclick="window.location.href='medical.html'">
+                <div class="module-icon">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20organ%20anatomy%20medical%20model%20realistic%20photo&image_size=square_hd" alt="人体解剖" style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px;">
+                </div>
+                <h2 class="module-title">医护专业</h2>
+                <p class="module-description">内脏组装小游戏，学习人体结构</p>
+            </div>
+            
+            <!-- 新能源汽车 -->
+            <div class="module-card" onclick="window.location.href='ev.html'">
+                <div class="module-icon">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electric%20car%20assembly%20parts%20battery%20realistic%20photo&image_size=square_hd" alt="新能源汽车" style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px;">
+                </div>
+                <h2 class="module-title">新能源汽车</h2>
+                <p class="module-description">汽车组装和材料特性模拟实验</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2026 学科模拟学习平台 | 专注于互动式学习体验</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 检查登录状态
+        function checkLoginStatus() {
+            const user = localStorage.getItem('user');
+            const userInfoElement = document.getElementById('user-info');
+            
+            if (user) {
+                const userData = JSON.parse(user);
+                let roleText = '';
+                let roleClass = '';
+                let panelLink = '';
+                
+                switch (userData.role) {
+                    case 'student':
+                        roleText = '学生';
+                        roleClass = 'role-student';
+                        break;
+                    case 'teacher':
+                        roleText = '教师';
+                        roleClass = 'role-teacher';
+                        panelLink = '<button class="panel-btn" onclick="window.location.href=\'teacher-panel.html\'">教师面板</button>';
+                        break;
+                    case 'admin':
+                        roleText = '管理员';
+                        roleClass = 'role-admin';
+                        panelLink = '<button class="panel-btn" onclick="window.location.href=\'admin-panel.html\'">管理员面板</button>';
+                        break;
+                }
+                
+                userInfoElement.innerHTML = `
+                    <span>欢迎, ${userData.username}</span>
+                    <span class="role-badge ${roleClass}">${roleText}</span>
+                    ${panelLink}
+                    <button class="logout-btn" onclick="logout()">退出登录</button>
+                `;
+            }
+        }
+        
+        // 退出登录
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.reload();
+        }
+        
+        // 页面加载时检查登录状态
+        window.onload = checkLoginStatus;
+    </script>
+</body>
+</html>

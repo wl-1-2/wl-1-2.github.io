@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新能源汽车 - 汽车组装与材料特性实验</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #3a506b, #1c2541);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin-top: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        
+        .tab-button {
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(145deg, #27ae60, #229954);
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #3a506b;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .car-selection {
+            margin-bottom: 30px;
+        }
+        
+        .selection-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .selection-header h2 {
+            color: #3a506b;
+            margin-bottom: 10px;
+        }
+        
+        .car-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .car-option {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #e9ecef;
+        }
+        
+        .car-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: #3a506b;
+        }
+        
+        .car-option.selected {
+            border-color: #27ae60;
+            background: #e8f5e8;
+        }
+        
+        .car-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+        
+        .car-name {
+            font-weight: 600;
+            color: #3a506b;
+            margin-bottom: 10px;
+        }
+        
+        .car-description {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .assembly-section {
+            margin-top: 30px;
+        }
+        
+        .assembly-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .assembly-title {
+            color: #3a506b;
+        }
+        
+        .assembly-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .control-btn.primary {
+            background: linear-gradient(145deg, #27ae60, #229954);
+        }
+        
+        .workspace {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .parts-container {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .parts-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .parts-header h3 {
+            color: #3a506b;
+        }
+        
+        .parts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+        }
+        
+        .part {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s;
+            border: 2px solid #e9ecef;
+            position: relative;
+        }
+        
+        .part:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            border-color: #3a506b;
+        }
+        
+        .part.dragging {
+            opacity: 0.8;
+            cursor: grabbing;
+            transform: scale(1.1);
+            z-index: 100;
+        }
+        
+        .part-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .part-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #3a506b;
+        }
+        
+        .assembly-area {
+            flex: 2;
+            min-width: 500px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            position: relative;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .car-frame-container {
+            position: relative;
+            display: block;
+            width: 100%;
+            max-width: 800px;
+            cursor: grab;
+        }
+        
+        .car-frame-container:active {
+            cursor: grabbing;
+        }
+        
+        .car-frame {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .zoom-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 10;
+        }
+        
+        .zoom-btn {
+            background: rgba(58, 80, 107, 0.8);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .zoom-btn:hover {
+            background: rgba(58, 80, 107, 1);
+        }
+        
+        .assembly-position {
+            position: absolute;
+            border: 2px dashed #3a506b;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .assembly-position:hover {
+            background: rgba(58, 80, 107, 0.1);
+            border-color: #27ae60;
+        }
+        
+        .assembly-position.filled {
+            border-color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+        }
+        
+        .assembly-position.wrong {
+            border-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+        
+        /* 系统选择标签样式 */
+        .system-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .system-tab {
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .system-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .system-tab.active {
+            background: linear-gradient(145deg, #27ae60, #229954);
+        }
+        
+        /* 材料特性实验样式 */
+        .material-experiment {
+            margin-top: 30px;
+        }
+        
+        .experiment-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .experiment-header h2 {
+            color: #3a506b;
+            margin-bottom: 10px;
+        }
+        
+        .material-selection {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 30px;
+        }
+        
+        .material-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .material-option {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .material-option:hover {
+            border-color: #3a506b;
+            transform: translateY(-2px);
+        }
+        
+        .material-option.selected {
+            border-color: #27ae60;
+            background: #e8f5e8;
+        }
+        
+        .material-name {
+            font-weight: 600;
+            color: #3a506b;
+            margin-bottom: 5px;
+        }
+        
+        .material-description {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .environment-controls {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 30px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #3a506b;
+        }
+        
+        .control-slider {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        
+        .control-value {
+            font-size: 14px;
+            color: #666;
+            text-align: right;
+        }
+        
+        .experiment-results {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .results-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+        
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3a506b;
+            margin-bottom: 10px;
+        }
+        
+        .result-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .result-card.good {
+            border-color: #27ae60;
+            background: #e8f5e8;
+        }
+        
+        .result-card.bad {
+            border-color: #e74c3c;
+            background: #fadbd8;
+        }
+        
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid #3a506b;
+        }
+        
+        .modal-title {
+            color: #3a506b;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .modal-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .correct-stat .stat-value {
+            color: #27ae60;
+        }
+        
+        .wrong-stat .stat-value {
+            color: #e74c3c;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .workspace {
+                flex-direction: column;
+            }
+            
+            .parts-container,
+            .assembly-area {
+                min-width: 100%;
+            }
+            
+            .back-button {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab-button {
+                width: 100%;
+            }
+            
+            .car-options,
+            .material-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .assembly-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .assembly-controls {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">← 返回首页</button>
+    
+    <div class="container">
+        <header>
+            <h1>新能源汽车 - 模拟实验</h1>
+            <p class="subtitle">汽车组装与材料特性实验</p>
+        </header>
+        
+        <!-- 标签页 -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('assembly')">汽车组装</button>
+            <button class="tab-button" onclick="switchTab('material')">材料特性实验</button>
+        </div>
+        
+        <!-- 汽车组装 -->
+        <div class="tab-content active" id="assembly-tab">
+            <div class="car-selection">
+                <div class="selection-header">
+                    <h2>选择汽车类型</h2>
+                    <p>请选择一种新能源汽车类型进行组装学习</p>
+                </div>
+                <div class="car-options">
+                    <div class="car-option" data-car="ev">
+                        <div class="car-icon">🚗</div>
+                        <div class="car-name">纯电动汽车</div>
+                        <div class="car-description">由电动机驱动，使用电池作为能源，零排放环保汽车</div>
+                    </div>
+                    <div class="car-option" data-car="hybrid">
+                        <div class="car-icon">🔋</div>
+                        <div class="car-name">混合动力汽车</div>
+                        <div class="car-description">结合传统发动机和电动机的混合动力系统</div>
+                    </div>
+                    <div class="car-option" data-car="fuel-cell">
+                        <div class="car-icon">⚡</div>
+                        <div class="car-name">燃料电池汽车</div>
+                        <div class="car-description">使用氢气作为燃料，通过燃料电池发电驱动</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="assembly-section" id="car-assembly">
+                <div class="assembly-header">
+                    <h2 class="assembly-title" id="car-title">汽车组装</h2>
+                    <div class="assembly-controls">
+                        <button class="control-btn" onclick="resetCarAssembly()">重置</button>
+                        <button class="control-btn" onclick="showCorrectLayout()">查看正确布局</button>
+                        <button class="control-btn primary" onclick="checkCarAssembly()">检查组装</button>
+                    </div>
+                </div>
+                
+                <!-- 系统选择标签 -->
+                <div class="system-tabs" id="system-tabs">
+                    <button class="system-tab active" data-system="engine">发动机系统</button>
+                    <button class="system-tab" data-system="transmission">变速箱系统</button>
+                    <button class="system-tab" data-system="chassis">底盘系统</button>
+                    <button class="system-tab" data-system="body">车身系统</button>
+                    <button class="system-tab" data-system="electrical">电气系统</button>
+                </div>
+                
+                <div class="workspace">
+                    <div class="parts-container">
+                        <div class="parts-header">
+                            <h3>可用零件</h3>
+                        </div>
+                        <div class="parts-grid" id="car-parts">
+                            <!-- 零件将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                    <div class="assembly-area">
+                        <div class="car-frame-container" id="car-frame-container">
+                            <div class="zoom-controls">
+                                <button class="zoom-btn" onclick="zoomIn()">+</button>
+                                <button class="zoom-btn" onclick="zoomOut()">-</button>
+                                <button class="zoom-btn" onclick="rotateCar()">↻</button>
+                            </div>
+                            <div class="car-frame" id="car-frame">
+                                <!-- 组装位置将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 材料特性实验 -->
+        <div class="tab-content" id="material-tab">
+            <div class="material-experiment">
+                <div class="experiment-header">
+                    <h2>材料特性模拟实验</h2>
+                    <p>测试不同材料在各种环境条件下的特性表现</p>
+                </div>
+                
+                <div class="material-selection">
+                    <h3>选择材料</h3>
+                    <div class="material-options">
+                        <div class="material-option" data-material="lithium">
+                            <div class="material-name">锂电池材料</div>
+                            <div class="material-description">用于电动汽车电池的核心材料</div>
+                        </div>
+                        <div class="material-option" data-material="aluminum">
+                            <div class="material-name">铝合金</div>
+                            <div class="material-description">用于汽车轻量化的金属材料</div>
+                        </div>
+                        <div class="material-option" data-material="carbon-fiber">
+                            <div class="material-name">碳纤维</div>
+                            <div class="material-description">高强度轻量化复合材料</div>
+                        </div>
+                        <div class="material-option" data-material="silicon">
+                            <div class="material-name">硅材料</div>
+                            <div class="material-description">用于半导体和电池的关键材料</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="environment-controls">
+                    <h3>环境参数控制</h3>
+                    <div class="control-group">
+                        <label class="control-label">温度 (°C)</label>
+                        <input type="range" class="control-slider" id="temperature" min="-20" max="80" value="25">
+                        <div class="control-value" id="temperature-value">25°C</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">湿度 (%)</label>
+                        <input type="range" class="control-slider" id="humidity" min="0" max="100" value="50">
+                        <div class="control-value" id="humidity-value">50%</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">光照强度 (lux)</label>
+                        <input type="range" class="control-slider" id="light" min="0" max="10000" value="5000">
+                        <div class="control-value" id="light-value">5000 lux</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">振动强度 (Hz)</label>
+                        <input type="range" class="control-slider" id="vibration" min="0" max="100" value="0">
+                        <div class="control-value" id="vibration-value">0 Hz</div>
+                    </div>
+                    <div class="assembly-controls" style="margin-top: 20px;">
+                        <button class="control-btn primary" onclick="testMaterial()">测试材料</button>
+                    </div>
+                </div>
+                
+                <div class="experiment-results">
+                    <div class="results-header">
+                        <h3>测试结果</h3>
+                    </div>
+                    <div class="results-grid">
+                        <div class="result-card" id="performance-card">
+                            <div class="result-value" id="performance-value">0%</div>
+                            <div class="result-label">性能表现</div>
+                        </div>
+                        <div class="result-card" id="lifespan-card">
+                            <div class="result-value" id="lifespan-value">0</div>
+                            <div class="result-label">预计寿命 (年)</div>
+                        </div>
+                        <div class="result-card" id="stability-card">
+                            <div class="result-value" id="stability-value">0%</div>
+                            <div class="result-label">稳定性</div>
+                        </div>
+                        <div class="result-card" id="efficiency-card">
+                            <div class="result-value" id="efficiency-value">0%</div>
+                            <div class="result-label">能量效率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果模态框 -->
+    <div class="result-modal" id="result-modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modal-title">组装结果</h2>
+            <div class="modal-stats">
+                <div class="stat-item correct-stat">
+                    <span class="stat-value" id="correct-count">0</span>
+                    <span class="stat-label">正确</span>
+                </div>
+                <div class="stat-item wrong-stat">
+                    <span class="stat-value" id="wrong-count">0</span>
+                    <span class="stat-label">错误</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="total-count">0</span>
+                    <span class="stat-label">总数</span>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeModal()">关闭</button>
+                <button class="control-btn primary" onclick="resetCarAssembly()">重新组装</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // 汽车数据 - 详细零件分类
+    const carData = {
+        ev: {
+            name: '纯电动汽车',
+            systems: {
+                engine: {
+                    name: '发动机系统',
+                    parts: [
+                        { id: 'battery', name: '电池组', icon: '🔋', position: 'battery', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electric%20car%20battery%20pack%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'motor', name: '电动机', icon: '⚡', position: 'motor', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electric%20car%20motor%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'controller', name: '电机控制器', icon: '🎮', position: 'controller', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electric%20car%20controller%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                transmission: {
+                    name: '变速箱系统',
+                    parts: [
+                        { id: 'reducer', name: '减速器', icon: '⚙️', position: 'reducer', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electric%20car%20reducer%20gearbox%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'half-shaft', name: '半轴', icon: '🔄', position: 'half-shaft', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20half%20shaft%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                chassis: {
+                    name: '底盘系统',
+                    parts: [
+                        { id: 'suspension', name: '悬挂系统', icon: '🔧', position: 'suspension', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20suspension%20system%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'brakes', name: '制动系统', icon: '🛑', position: 'brakes', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20brake%20system%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'steering', name: '转向系统', icon: '🧭', position: 'steering', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20steering%20system%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'wheels', name: '车轮', icon: '🔄', position: 'wheels', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20wheels%20and%20tires%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                body: {
+                    name: '车身系统',
+                    parts: [
+                        { id: 'body-frame', name: '车身框架', icon: '🚗', position: 'body-frame', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20body%20frame%20chassis%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'doors', name: '车门', icon: '🚪', position: 'doors', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20doors%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'windows', name: '车窗', icon: '🪟', position: 'windows', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20windows%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'lights', name: '车灯', icon: '💡', position: 'lights', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20headlights%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                electrical: {
+                    name: '电气系统',
+                    parts: [
+                        { id: 'wiring', name: '线束', icon: '🔌', position: 'wiring', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20electrical%20wiring%20harness%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'battery', name: '辅助电池', icon: '🔋', position: 'aux-battery', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20auxiliary%20battery%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'charger', name: '充电器', icon: '⚡', position: 'charger', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electric%20car%20charger%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                }
+            },
+            positions: {
+                engine: [
+                    { id: 'battery', x: '30%', y: '50%', width: 120, height: 80 },
+                    { id: 'motor', x: '60%', y: '45%', width: 100, height: 80 },
+                    { id: 'controller', x: '45%', y: '35%', width: 80, height: 60 }
+                ],
+                transmission: [
+                    { id: 'reducer', x: '65%', y: '55%', width: 90, height: 70 },
+                    { id: 'half-shaft', x: '75%', y: '60%', width: 120, height: 40 }
+                ],
+                chassis: [
+                    { id: 'suspension', x: '50%', y: '65%', width: 180, height: 60 },
+                    { id: 'brakes', x: '70%', y: '70%', width: 60, height: 60 },
+                    { id: 'steering', x: '30%', y: '60%', width: 80, height: 60 },
+                    { id: 'wheels', x: '50%', y: '75%', width: 200, height: 50 }
+                ],
+                body: [
+                    { id: 'body-frame', x: '50%', y: '40%', width: 220, height: 140 },
+                    { id: 'doors', x: '30%', y: '45%', width: 60, height: 80 },
+                    { id: 'windows', x: '35%', y: '35%', width: 50, height: 40 },
+                    { id: 'lights', x: '20%', y: '30%', width: 40, height: 30 }
+                ],
+                electrical: [
+                    { id: 'wiring', x: '50%', y: '45%', width: 180, height: 100 },
+                    { id: 'aux-battery', x: '25%', y: '65%', width: 60, height: 50 },
+                    { id: 'charger', x: '20%', y: '40%', width: 70, height: 50 }
+                ]
+            }
+        },
+        hybrid: {
+            name: '混合动力汽车',
+            systems: {
+                engine: {
+                    name: '发动机系统',
+                    parts: [
+                        { id: 'engine', name: '发动机', icon: '🔧', position: 'engine', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hybrid%20car%20engine%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'battery', name: '电池组', icon: '🔋', position: 'battery', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hybrid%20car%20battery%20pack%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'motor', name: '电动机', icon: '⚡', position: 'motor', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hybrid%20car%20motor%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                transmission: {
+                    name: '变速箱系统',
+                    parts: [
+                        { id: 'transmission', name: '变速箱', icon: '⚙️', position: 'transmission', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hybrid%20car%20transmission%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'clutch', name: '离合器', icon: '🔄', position: 'clutch', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20clutch%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'half-shaft', name: '半轴', icon: '🔄', position: 'half-shaft', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20half%20shaft%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                chassis: {
+                    name: '底盘系统',
+                    parts: [
+                        { id: 'suspension', name: '悬挂系统', icon: '🔧', position: 'suspension', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20suspension%20system%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'brakes', name: '制动系统', icon: '🛑', position: 'brakes', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20brake%20system%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'steering', name: '转向系统', icon: '🧭', position: 'steering', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20steering%20system%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'wheels', name: '车轮', icon: '🔄', position: 'wheels', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20wheels%20and%20tires%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                body: {
+                    name: '车身系统',
+                    parts: [
+                        { id: 'body-frame', name: '车身框架', icon: '🚗', position: 'body-frame', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20body%20frame%20chassis%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'doors', name: '车门', icon: '🚪', position: 'doors', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20doors%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'windows', name: '车窗', icon: '🪟', position: 'windows', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20windows%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'lights', name: '车灯', icon: '💡', position: 'lights', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20headlights%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                electrical: {
+                    name: '电气系统',
+                    parts: [
+                        { id: 'wiring', name: '线束', icon: '🔌', position: 'wiring', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20electrical%20wiring%20harness%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'battery', name: '辅助电池', icon: '🔋', position: 'aux-battery', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20auxiliary%20battery%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'generator', name: '发电机', icon: '⚡', position: 'generator', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20generator%20alternator%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                }
+            },
+            positions: {
+                engine: [
+                    { id: 'engine', x: '60%', y: '45%', width: 120, height: 80 },
+                    { id: 'battery', x: '30%', y: '50%', width: 100, height: 70 },
+                    { id: 'motor', x: '50%', y: '45%', width: 90, height: 70 }
+                ],
+                transmission: [
+                    { id: 'transmission', x: '65%', y: '55%', width: 100, height: 70 },
+                    { id: 'clutch', x: '60%', y: '50%', width: 80, height: 60 },
+                    { id: 'half-shaft', x: '75%', y: '60%', width: 120, height: 40 }
+                ],
+                chassis: [
+                    { id: 'suspension', x: '50%', y: '65%', width: 180, height: 60 },
+                    { id: 'brakes', x: '70%', y: '70%', width: 60, height: 60 },
+                    { id: 'steering', x: '30%', y: '60%', width: 80, height: 60 },
+                    { id: 'wheels', x: '50%', y: '75%', width: 200, height: 50 }
+                ],
+                body: [
+                    { id: 'body-frame', x: '50%', y: '40%', width: 220, height: 140 },
+                    { id: 'doors', x: '30%', y: '45%', width: 60, height: 80 },
+                    { id: 'windows', x: '35%', y: '35%', width: 50, height: 40 },
+                    { id: 'lights', x: '20%', y: '30%', width: 40, height: 30 }
+                ],
+                electrical: [
+                    { id: 'wiring', x: '50%', y: '45%', width: 180, height: 100 },
+                    { id: 'aux-battery', x: '25%', y: '65%', width: 60, height: 50 },
+                    { id: 'generator', x: '55%', y: '35%', width: 70, height: 50 }
+                ]
+            }
+        },
+        'fuel-cell': {
+            name: '燃料电池汽车',
+            systems: {
+                engine: {
+                    name: '发动机系统',
+                    parts: [
+                        { id: 'fuel-cell', name: '燃料电池', icon: '⚡', position: 'fuel-cell', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=fuel%20cell%20stack%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'hydrogen-tank', name: '氢气罐', icon: '🧪', position: 'hydrogen-tank', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hydrogen%20fuel%20tank%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'motor', name: '电动机', icon: '⚡', position: 'motor', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electric%20car%20motor%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                transmission: {
+                    name: '变速箱系统',
+                    parts: [
+                        { id: 'reducer', name: '减速器', icon: '⚙️', position: 'reducer', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=electric%20car%20reducer%20gearbox%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'half-shaft', name: '半轴', icon: '🔄', position: 'half-shaft', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20half%20shaft%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                chassis: {
+                    name: '底盘系统',
+                    parts: [
+                        { id: 'suspension', name: '悬挂系统', icon: '🔧', position: 'suspension', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20suspension%20system%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'brakes', name: '制动系统', icon: '🛑', position: 'brakes', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20brake%20system%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'steering', name: '转向系统', icon: '🧭', position: 'steering', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20steering%20system%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'wheels', name: '车轮', icon: '🔄', position: 'wheels', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20wheels%20and%20tires%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                body: {
+                    name: '车身系统',
+                    parts: [
+                        { id: 'body-frame', name: '车身框架', icon: '🚗', position: 'body-frame', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20body%20frame%20chassis%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'doors', name: '车门', icon: '🚪', position: 'doors', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20doors%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'windows', name: '车窗', icon: '🪟', position: 'windows', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20windows%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'lights', name: '车灯', icon: '💡', position: 'lights', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20headlights%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                },
+                electrical: {
+                    name: '电气系统',
+                    parts: [
+                        { id: 'wiring', name: '线束', icon: '🔌', position: 'wiring', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20electrical%20wiring%20harness%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'battery', name: '辅助电池', icon: '🔋', position: 'aux-battery', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=car%20auxiliary%20battery%20realistic%20technical%20drawing&image_size=square' },
+                        { id: 'controller', name: '燃料电池控制器', icon: '🎮', position: 'controller', image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=fuel%20cell%20controller%20realistic%20technical%20drawing&image_size=square' }
+                    ]
+                }
+            },
+            positions: {
+                engine: [
+                    { id: 'fuel-cell', x: '45%', y: '45%', width: 120, height: 80 },
+                    { id: 'hydrogen-tank', x: '25%', y: '55%', width: 80, height: 80 },
+                    { id: 'motor', x: '65%', y: '45%', width: 100, height: 80 }
+                ],
+                transmission: [
+                    { id: 'reducer', x: '70%', y: '55%', width: 90, height: 70 },
+                    { id: 'half-shaft', x: '75%', y: '60%', width: 120, height: 40 }
+                ],
+                chassis: [
+                    { id: 'suspension', x: '50%', y: '65%', width: 180, height: 60 },
+                    { id: 'brakes', x: '70%', y: '70%', width: 60, height: 60 },
+                    { id: 'steering', x: '30%', y: '60%', width: 80, height: 60 },
+                    { id: 'wheels', x: '50%', y: '75%', width: 200, height: 50 }
+                ],
+                body: [
+                    { id: 'body-frame', x: '50%', y: '40%', width: 220, height: 140 },
+                    { id: 'doors', x: '30%', y: '45%', width: 60, height: 80 },
+                    { id: 'windows', x: '35%', y: '35%', width: 50, height: 40 },
+                    { id: 'lights', x: '20%', y: '30%', width: 40, height: 30 }
+                ],
+                electrical: [
+                    { id: 'wiring', x: '50%', y: '45%', width: 180, height: 100 },
+                    { id: 'aux-battery', x: '25%', y: '65%', width: 60, height: 50 },
+                    { id: 'controller', x: '40%', y: '35%', width: 80, height: 60 }
+                ]
+            }
+        }
+    };
+    
+    // 材料数据
+    const materialData = {
+        lithium: {
+            name: '锂电池材料',
+            basePerformance: 85,
+            baseLifespan: 8,
+            baseStability: 75,
+            baseEfficiency: 90,
+            temperatureSensitivity: 0.8,
+            humiditySensitivity: 0.3,
+            lightSensitivity: 0.1,
+            vibrationSensitivity: 0.5
+        },
+        aluminum: {
+            name: '铝合金',
+            basePerformance: 90,
+            baseLifespan: 15,
+            baseStability: 95,
+            baseEfficiency: 80,
+            temperatureSensitivity: 0.2,
+            humiditySensitivity: 0.4,
+            lightSensitivity: 0.1,
+            vibrationSensitivity: 0.3
+        },
+        'carbon-fiber': {
+            name: '碳纤维',
+            basePerformance: 95,
+            baseLifespan: 20,
+            baseStability: 90,
+            baseEfficiency: 85,
+            temperatureSensitivity: 0.3,
+            humiditySensitivity: 0.2,
+            lightSensitivity: 0.1,
+            vibrationSensitivity: 0.2
+        },
+        silicon: {
+            name: '硅材料',
+            basePerformance: 80,
+            baseLifespan: 10,
+            baseStability: 70,
+            baseEfficiency: 85,
+            temperatureSensitivity: 1.0,
+            humiditySensitivity: 0.5,
+            lightSensitivity: 0.3,
+            vibrationSensitivity: 0.8
+        }
+    };
+    
+    let selectedCar = null;
+    let selectedSystem = 'engine';
+    let selectedMaterial = 'lithium';
+    let currentAssembly = {};
+    let zoom = 1;
+    let rotation = 0;
+    
+    // DOM元素
+    const assemblyTab = document.getElementById('assembly-tab');
+    const materialTab = document.getElementById('material-tab');
+    const carTitle = document.getElementById('car-title');
+    const carParts = document.getElementById('car-parts');
+    const carFrame = document.getElementById('car-frame');
+    const carFrameContainer = document.getElementById('car-frame-container');
+    const systemTabs = document.getElementById('system-tabs');
+    const temperatureSlider = document.getElementById('temperature');
+    const temperatureValue = document.getElementById('temperature-value');
+    const humiditySlider = document.getElementById('humidity');
+    const humidityValue = document.getElementById('humidity-value');
+    const lightSlider = document.getElementById('light');
+    const lightValue = document.getElementById('light-value');
+    const vibrationSlider = document.getElementById('vibration');
+    const vibrationValue = document.getElementById('vibration-value');
+    const performanceValue = document.getElementById('performance-value');
+    const lifespanValue = document.getElementById('lifespan-value');
+    const stabilityValue = document.getElementById('stability-value');
+    const efficiencyValue = document.getElementById('efficiency-value');
+    const performanceCard = document.getElementById('performance-card');
+    const lifespanCard = document.getElementById('lifespan-card');
+    const stabilityCard = document.getElementById('stability-card');
+    const efficiencyCard = document.getElementById('efficiency-card');
+    const resultModal = document.getElementById('result-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const correctCountElement = document.getElementById('correct-count');
+    const wrongCountElement = document.getElementById('wrong-count');
+    const totalCountElement = document.getElementById('total-count');
+    
+    // 初始化
+    function init() {
+        // 添加汽车选择事件
+        document.querySelectorAll('.car-option').forEach(option => {
+            option.addEventListener('click', () => {
+                selectCar(option.dataset.car);
+            });
+        });
+        
+        // 添加系统选择事件
+        document.querySelectorAll('.system-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                selectSystem(tab.dataset.system);
+            });
+        });
+        
+        // 添加材料选择事件
+        document.querySelectorAll('.material-option').forEach(option => {
+            option.addEventListener('click', () => {
+                selectMaterial(option.dataset.material);
+            });
+        });
+        
+        // 添加滑块事件
+        temperatureSlider.addEventListener('input', updateSliderValues);
+        humiditySlider.addEventListener('input', updateSliderValues);
+        lightSlider.addEventListener('input', updateSliderValues);
+        vibrationSlider.addEventListener('input', updateSliderValues);
+        
+        // 初始化
+        selectCar('ev');
+        selectSystem('engine');
+        selectMaterial('lithium');
+        updateSliderValues();
+    }
+    
+    // 选择系统
+    function selectSystem(systemType) {
+        selectedSystem = systemType;
+        
+        // 更新UI
+        document.querySelectorAll('.system-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelector(`[data-system="${systemType}"]`).classList.add('active');
+        
+        // 重新初始化组装
+        initCarAssembly();
+    }
+    
+    // 切换标签页
+    function switchTab(tab) {
+        // 重置所有标签和内容
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        // 激活选中的标签
+        document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+        document.getElementById(`${tab}-tab`).classList.add('active');
+    }
+    
+    // 选择汽车
+    function selectCar(carType) {
+        selectedCar = carType;
+        
+        // 更新UI
+        document.querySelectorAll('.car-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        document.querySelector(`[data-car="${carType}"]`).classList.add('selected');
+        
+        // 更新标题
+        carTitle.textContent = carData[carType].name + ' 组装';
+        
+        // 初始化组装
+        initCarAssembly();
+    }
+    
+    // 初始化汽车组装
+    function initCarAssembly() {
+        if (!selectedCar) return;
+        
+        const car = carData[selectedCar];
+        const system = car.systems[selectedSystem];
+        const positions = car.positions[selectedSystem];
+        
+        // 清空零件和组装区域
+        carParts.innerHTML = '';
+        carFrame.innerHTML = '';
+        currentAssembly = {};
+        
+        // 重置缩放和旋转
+        zoom = 1;
+        rotation = 0;
+        updateCarFrameTransform();
+        
+        // 设置汽车框架背景图片
+        let frameImage = '';
+        if (selectedCar === 'ev') {
+            frameImage = 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=real%20electric%20car%20chassis%20frame%20photograph%20top%20view%20with%20suspension%20and%20components&image_size=landscape_4_3';
+        } else if (selectedCar === 'hybrid') {
+            frameImage = 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=real%20hybrid%20car%20chassis%20frame%20photograph%20top%20view%20with%20engine%20and%20components&image_size=landscape_4_3';
+        } else {
+            frameImage = 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=real%20fuel%20cell%20car%20chassis%20frame%20photograph%20top%20view%20with%20hydrogen%20tanks&image_size=landscape_4_3';
+        }
+        carFrame.style.backgroundImage = `url('${frameImage}')`;
+        
+        // 更新标题
+        carTitle.textContent = car.name + ' - ' + system.name + ' 组装';
+        
+        // 生成零件
+        system.parts.forEach(part => {
+            const partElement = document.createElement('div');
+            partElement.id = part.id;
+            partElement.className = 'part';
+            partElement.dataset.partId = part.id;
+            partElement.dataset.correctPosition = part.position;
+            partElement.innerHTML = `
+                <div class="part-image" style="width: 80px; height: 80px; margin: 0 auto 10px; overflow: hidden; border-radius: 4px;">
+                    <img src="${part.image}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="part-name">${part.name}</div>
+            `;
+            
+            // 添加拖拽事件
+            partElement.addEventListener('mousedown', startDrag);
+            carParts.appendChild(partElement);
+        });
+        
+        // 生成组装位置
+        positions.forEach(position => {
+            const positionElement = document.createElement('div');
+            positionElement.id = `position-${position.id}`;
+            positionElement.className = 'assembly-position';
+            positionElement.dataset.positionId = position.id;
+            positionElement.style.left = position.x;
+            positionElement.style.top = position.y;
+            positionElement.style.width = position.width + 'px';
+            positionElement.style.height = position.height + 'px';
+            positionElement.style.transform = 'translate(-50%, -50%)';
+            positionElement.style.pointerEvents = 'auto';
+            
+            // 添加放置事件
+            positionElement.addEventListener('dragover', allowDrop);
+            positionElement.addEventListener('drop', dropPart);
+            
+            carFrame.appendChild(positionElement);
+        });
+    }
+    
+    // 开始拖拽
+    function startDrag(e) {
+        const part = e.target.closest('.part');
+        if (!part) return;
+        
+        part.classList.add('dragging');
+        
+        function onMouseMove(e) {
+            part.style.position = 'fixed';
+            part.style.left = (e.clientX - 50) + 'px';
+            part.style.top = (e.clientY - 50) + 'px';
+            part.style.zIndex = '100';
+        }
+        
+        function onMouseUp(e) {
+            part.classList.remove('dragging');
+            part.style.position = '';
+            part.style.left = '';
+            part.style.top = '';
+            part.style.zIndex = '';
+            
+            const position = document.elementFromPoint(e.clientX, e.clientY).closest('.assembly-position');
+            if (position) {
+                dropPart({ target: position, dataTransfer: { getData: () => part.dataset.partId } });
+            }
+            
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+        
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    }
+    
+    // 允许放置
+    function allowDrop(e) {
+        e.preventDefault();
+    }
+    
+    // 放置零件
+    function dropPart(e) {
+        e.preventDefault();
+        const position = e.target.closest('.assembly-position');
+        if (!position) return;
+        
+        const partId = e.dataTransfer ? e.dataTransfer.getData('text') : e.dataTransfer.getData();
+        const part = document.getElementById(partId);
+        if (!part) return;
+        
+        // 检查是否已放置
+        const existingPart = position.querySelector('.part');
+        if (existingPart) {
+            // 移除现有零件
+            carParts.appendChild(existingPart);
+            delete currentAssembly[position.dataset.positionId];
+        }
+        
+        // 移动零件到位置
+        position.appendChild(part);
+        position.classList.add('filled');
+        
+        // 记录组装
+        currentAssembly[position.dataset.positionId] = partId;
+        
+        // 检查是否正确
+        const correctPosition = part.dataset.correctPosition;
+        if (correctPosition === position.dataset.positionId) {
+            position.classList.remove('wrong');
+        } else {
+            position.classList.add('wrong');
+        }
+    }
+    
+    // 检查汽车组装
+    function checkCarAssembly() {
+        if (!selectedCar) return;
+        
+        const car = carData[selectedCar];
+        const positions = car.positions[selectedSystem];
+        const system = car.systems[selectedSystem];
+        let correct = 0;
+        let wrong = 0;
+        
+        // 检查每个位置
+        positions.forEach(position => {
+            const partId = currentAssembly[position.id];
+            if (partId) {
+                const part = document.getElementById(partId);
+                if (part.dataset.correctPosition === position.id) {
+                    correct++;
+                    document.getElementById(`position-${position.id}`).classList.remove('wrong');
+                    document.getElementById(`position-${position.id}`).classList.add('filled');
+                } else {
+                    wrong++;
+                    document.getElementById(`position-${position.id}`).classList.add('wrong');
+                }
+            }
+        });
+        
+        // 更新模态框
+        correctCountElement.textContent = correct;
+        wrongCountElement.textContent = wrong;
+        totalCountElement.textContent = system.parts.length;
+        
+        if (correct === system.parts.length) {
+            modalTitle.textContent = '组装成功！';
+        } else {
+            modalTitle.textContent = '组装结果';
+        }
+        
+        // 显示模态框
+        resultModal.style.display = 'flex';
+    }
+    
+    // 显示正确布局
+    function showCorrectLayout() {
+        if (!selectedCar) return;
+        
+        const car = carData[selectedCar];
+        const system = car.systems[selectedSystem];
+        const positions = car.positions[selectedSystem];
+        
+        // 清空零件和组装区域
+        carParts.innerHTML = '';
+        carFrame.innerHTML = '';
+        currentAssembly = {};
+        
+        // 生成正确布局
+        system.parts.forEach(part => {
+            // 找到零件的正确位置
+            const correctPosition = positions.find(pos => pos.id === part.position);
+            if (correctPosition) {
+                const positionElement = document.createElement('div');
+                positionElement.id = `position-${correctPosition.id}`;
+                positionElement.className = 'assembly-position filled';
+                positionElement.dataset.positionId = correctPosition.id;
+                positionElement.style.left = correctPosition.x;
+                positionElement.style.top = correctPosition.y;
+                positionElement.style.width = correctPosition.width + 'px';
+                positionElement.style.height = correctPosition.height + 'px';
+                positionElement.style.transform = 'translate(-50%, -50%)';
+                
+                // 创建零件元素
+                const partElement = document.createElement('div');
+                partElement.id = part.id;
+                partElement.className = 'part';
+                partElement.dataset.partId = part.id;
+                partElement.dataset.correctPosition = part.position;
+                partElement.innerHTML = `
+                    <div class="part-image" style="width: 80px; height: 80px; margin: 0 auto 10px; overflow: hidden; border-radius: 4px;">
+                        <img src="${part.image}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="part-name">${part.name}</div>
+                `;
+                
+                positionElement.appendChild(partElement);
+                carFrame.appendChild(positionElement);
+            }
+        });
+    }
+    
+    // 重置汽车组装
+    function resetCarAssembly() {
+        initCarAssembly();
+        closeModal();
+    }
+    
+    // 选择材料
+    function selectMaterial(materialType) {
+        selectedMaterial = materialType;
+        
+        // 更新UI
+        document.querySelectorAll('.material-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        document.querySelector(`[data-material="${materialType}"]`).classList.add('selected');
+        
+        // 测试材料
+        testMaterial();
+    }
+    
+    // 更新滑块值
+    function updateSliderValues() {
+        temperatureValue.textContent = temperatureSlider.value + '°C';
+        humidityValue.textContent = humiditySlider.value + '%';
+        lightValue.textContent = lightSlider.value + ' lux';
+        vibrationValue.textContent = vibrationSlider.value + ' Hz';
+    }
+    
+    // 测试材料
+    function testMaterial() {
+        const material = materialData[selectedMaterial];
+        const temperature = parseInt(temperatureSlider.value);
+        const humidity = parseInt(humiditySlider.value);
+        const light = parseInt(lightSlider.value);
+        const vibration = parseInt(vibrationSlider.value);
+        
+        // 计算环境影响
+        const tempImpact = Math.abs(temperature - 25) * material.temperatureSensitivity;
+        const humidityImpact = humidity * material.humiditySensitivity;
+        const lightImpact = (light / 10000) * material.lightSensitivity * 100;
+        const vibrationImpact = vibration * material.vibrationSensitivity;
+        
+        const totalImpact = tempImpact + humidityImpact + lightImpact + vibrationImpact;
+        
+        // 计算性能
+        let performance = Math.max(0, material.basePerformance - totalImpact * 0.5);
+        let lifespan = Math.max(0, material.baseLifespan - totalImpact * 0.05);
+        let stability = Math.max(0, material.baseStability - totalImpact * 0.4);
+        let efficiency = Math.max(0, material.baseEfficiency - totalImpact * 0.3);
+        
+        // 更新UI
+        performanceValue.textContent = Math.round(performance) + '%';
+        lifespanValue.textContent = lifespan.toFixed(1);
+        stabilityValue.textContent = Math.round(stability) + '%';
+        efficiencyValue.textContent = Math.round(efficiency) + '%';
+        
+        // 更新卡片状态
+        updateCardStatus(performanceCard, performance);
+        updateCardStatus(lifespanCard, lifespan * 10);
+        updateCardStatus(stabilityCard, stability);
+        updateCardStatus(efficiencyCard, efficiency);
+    }
+    
+    // 更新卡片状态
+    function updateCardStatus(card, value) {
+        card.className = 'result-card';
+        if (value >= 80) {
+            card.classList.add('good');
+        } else if (value < 50) {
+            card.classList.add('bad');
+        }
+    }
+    
+    // 更新汽车框架变换
+    function updateCarFrameTransform() {
+        if (carFrameContainer) {
+            carFrameContainer.style.transform = `scale(${zoom}) rotate(${rotation}deg)`;
+            carFrameContainer.style.transformOrigin = 'center center';
+        }
+    }
+    
+    // 放大
+    function zoomIn() {
+        if (zoom < 2) {
+            zoom += 0.1;
+            updateCarFrameTransform();
+        }
+    }
+    
+    // 缩小
+    function zoomOut() {
+        if (zoom > 0.5) {
+            zoom -= 0.1;
+            updateCarFrameTransform();
+        }
+    }
+    
+    // 旋转
+    function rotateCar() {
+        rotation += 90;
+        if (rotation >= 360) {
+            rotation = 0;
+        }
+        updateCarFrameTransform();
+    }
+    
+    // 关闭模态框
+    function closeModal() {
+        resultModal.style.display = 'none';
+    }
+    
+    // 初始化应用
+    init();
+    </script>
+</body>
+</html>

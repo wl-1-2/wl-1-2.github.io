@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物联网 - 全屋智能家居设计</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #3a506b, #1c2541);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin-top: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .design-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #3a506b;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .design-header {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .design-title {
+            color: #3a506b;
+        }
+        
+        .house-type-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .house-type-btn {
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .house-type-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .house-type-btn.active {
+            background: linear-gradient(145deg, #27ae60, #229954);
+        }
+        
+        .design-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .control-btn {
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .control-btn.primary {
+            background: linear-gradient(145deg, #27ae60, #229954);
+        }
+        
+        .control-btn.secondary {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+        }
+        
+        .design-workspace {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .house-container {
+            flex: 4;
+            min-width: 800px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            position: relative;
+        }
+        
+        .house-title {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        
+        .house-title h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .house-title .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .house-layout {
+            position: relative;
+            width: 1000px;
+            height: 700px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 3px solid #2c3e50;
+            overflow: hidden;
+            margin: 0 auto;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .room {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #2c3e50;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.12);
+        }
+        
+        .room::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            bottom: 6px;
+            border: 1px dashed #95a5a6;
+            border-radius: 2px;
+            pointer-events: none;
+        }
+        
+        .room-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: center;
+            line-height: 1.3;
+        }
+        
+        .room:hover {
+            background: rgba(255, 255, 255, 0.98);
+            transform: scale(1.03);
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.18);
+            z-index: 10;
+        }
+        
+        .device {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            border: 2px solid #2980b9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            z-index: 100;
+        }
+        
+        .device:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+        
+        .device.selected {
+            border: 3px solid #e74c3c;
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
+            transform: scale(1.2);
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            background: red;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 101;
+        }
+        
+        .device-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .device-item:hover {
+            background: #e3f2fd;
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .device-item.selected {
+            background: #e3f2fd;
+            border-color: #3498db;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+        
+        .device.living-room {
+            background: #3498db;
+        }
+        
+        .device.kitchen {
+            background: #e67e22;
+        }
+        
+        .device.bedroom {
+            background: #9b59b6;
+        }
+        
+        .device.secondary-bedroom {
+            background: #8e44ad;
+        }
+        
+        .device.bathroom {
+            background: #1abc9c;
+        }
+        
+        .device.balcony {
+            background: #27ae60;
+        }
+        
+        .device-controls {
+            position: absolute;
+            background: white;
+            border: 2px solid #3a506b;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 200;
+            min-width: 200px;
+        }
+        
+        .device-controls h4 {
+            color: #3a506b;
+            margin-bottom: 10px;
+        }
+        
+        .control-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .control-toggle {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .toggle-label {
+            flex: 1;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #27ae60;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+        
+        .device-library {
+            flex: 2;
+            min-width: 600px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .library-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .library-header h3 {
+            color: #3a506b;
+        }
+        
+        .space-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .space-tab {
+            padding: 8px 15px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .space-tab:hover {
+            background: #d3d9df;
+        }
+        
+        .space-tab.active {
+            background: #3a506b;
+            color: white;
+        }
+        
+        .device-categories {
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .category {
+            margin-bottom: 20px;
+        }
+        
+        .category h4 {
+            color: #3a506b;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+        }
+        
+        .device-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s;
+        }
+        
+        .device-item:hover {
+            border-color: #3a506b;
+            transform: translateY(-2px);
+        }
+        
+        .device-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .device-name {
+            font-size: 10px;
+            font-weight: 600;
+            color: #3a506b;
+        }
+        
+        .design-info {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #3a506b;
+        }
+        
+        .info-value {
+            color: #666;
+        }
+        
+        .network-design {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-top: 20px;
+        }
+        
+        .network-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .network-header h3 {
+            color: #3a506b;
+        }
+        
+        .network-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        
+        
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid #3a506b;
+        }
+        
+        .modal-title {
+            color: #3a506b;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .modal-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .correct-stat .stat-value {
+            color: #27ae60;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 1200px) {
+            .design-workspace {
+                flex-direction: column;
+            }
+            
+            .house-container,
+            .device-library {
+                min-width: 100%;
+            }
+            
+            .device-categories {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-button {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .design-header {
+                gap: 15px;
+            }
+            
+            .house-type-selector,
+            .design-controls {
+                justify-content: center;
+            }
+            
+            .house-layout {
+                width: 100%;
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">← 返回首页</button>
+    
+    <div class="container">
+        <header>
+            <h1>物联网 - 全屋智能家居设计</h1>
+            <p class="subtitle">设计您的智能家居系统</p>
+        </header>
+        
+        <div class="design-container">
+            <div class="design-header">
+                <h2 class="design-title">全屋智能家居设计</h2>
+                
+                <!-- 户型选择 -->
+                <div class="house-type-selector">
+                    <button class="house-type-btn active" data-type="one-room">一室一厅</button>
+                    <button class="house-type-btn" data-type="two-room">两室一厅</button>
+                    <button class="house-type-btn" data-type="three-room">三室一厅</button>
+                    <button class="house-type-btn" data-type="three-room-two-hall">三室两厅</button>
+                </div>
+                
+                <div class="design-controls">
+                    <button class="control-btn" onclick="resetDesign()">重置</button>
+                    <button class="control-btn" onclick="generate3DModel()">3D模型</button>
+                    <button class="control-btn primary" onclick="checkDesign()">检查设计</button>
+                </div>
+            </div>
+            
+            <div class="design-workspace">
+                <!-- 房屋布局 -->
+                <div class="house-container">
+                    <div class="house-layout" id="house-layout">
+                        <!-- 房间和设备将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 设备库 -->
+                <div class="device-library">
+                    <div class="library-header">
+                        <h3>设备库</h3>
+                        <p style="font-size: 12px; color: #666; margin-top: 10px;">操作说明：点击设备库中的设备，然后点击户型图中的房间位置添加设备</p>
+                        <button class="control-btn secondary" onclick="addNewDevice()" style="margin-top: 10px;">新增设备</button>
+                    </div>
+                    
+                    <!-- 空间选择标签 -->
+                    <div class="space-tabs">
+                        <button class="space-tab active" data-space="all">全部</button>
+                        <button class="space-tab" data-space="living-room">客厅</button>
+                        <button class="space-tab" data-space="kitchen">厨房</button>
+                        <button class="space-tab" data-space="bedroom">主卧</button>
+                        <button class="space-tab" data-space="secondary-bedroom">次卧</button>
+                        <button class="space-tab" data-space="bathroom">卫生间</button>
+                        <button class="space-tab" data-space="balcony">阳台</button>
+                    </div>
+                    
+                    <div class="device-categories">
+                        <!-- 客厅设备 -->
+                        <div class="category" data-space="living-room">
+                            <h4>客厅设备</h4>
+                            <div class="device-grid">
+                                <div class="device-item" data-device="tv" data-space="living-room" data-category="entertainment">
+                                    <div class="device-icon">📺</div>
+                                    <div class="device-name">智能电视</div>
+                                </div>
+                                <div class="device-item" data-device="air-conditioner" data-space="living-room" data-category="climate">
+                                    <div class="device-icon">❄️</div>
+                                    <div class="device-name">智能空调</div>
+                                </div>
+                                <div class="device-item" data-device="speaker" data-space="living-room" data-category="entertainment">
+                                    <div class="device-icon">🔊</div>
+                                    <div class="device-name">智能音箱</div>
+                                </div>
+                                <div class="device-item" data-device="curtain" data-space="living-room" data-category="automation">
+                                    <div class="device-icon">🚪</div>
+                                    <div class="device-name">智能窗帘</div>
+                                </div>
+                                <div class="device-item" data-device="lighting" data-space="living-room" data-category="lighting">
+                                    <div class="device-icon">💡</div>
+                                    <div class="device-name">智能照明</div>
+                                </div>
+                                <div class="device-item" data-device="sofa" data-space="living-room" data-category="furniture">
+                                    <div class="device-icon">🛋️</div>
+                                    <div class="device-name">智能沙发</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 厨房设备 -->
+                        <div class="category" data-space="kitchen">
+                            <h4>厨房设备</h4>
+                            <div class="device-grid">
+                                <div class="device-item" data-device="refrigerator" data-space="kitchen" data-category="appliance">
+                                    <div class="device-icon">🧊</div>
+                                    <div class="device-name">智能冰箱</div>
+                                </div>
+                                <div class="device-item" data-device="oven" data-space="kitchen" data-category="appliance">
+                                    <div class="device-icon">🍳</div>
+                                    <div class="device-name">智能烤箱</div>
+                                </div>
+                                <div class="device-item" data-device="dishwasher" data-space="kitchen" data-category="appliance">
+                                    <div class="device-icon">🍽️</div>
+                                    <div class="device-name">智能洗碗机</div>
+                                </div>
+                                <div class="device-item" data-device="lighting" data-space="kitchen" data-category="lighting">
+                                    <div class="device-icon">💡</div>
+                                    <div class="device-name">智能照明</div>
+                                </div>
+                                <div class="device-item" data-device="hood" data-space="kitchen" data-category="appliance">
+                                    <div class="device-icon">🌬️</div>
+                                    <div class="device-name">智能油烟机</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 主卧设备 -->
+                        <div class="category" data-space="bedroom">
+                            <h4>主卧设备</h4>
+                            <div class="device-grid">
+                                <div class="device-item" data-device="lighting" data-space="bedroom" data-category="lighting">
+                                    <div class="device-icon">💡</div>
+                                    <div class="device-name">智能照明</div>
+                                </div>
+                                <div class="device-item" data-device="air-conditioner" data-space="bedroom" data-category="climate">
+                                    <div class="device-icon">❄️</div>
+                                    <div class="device-name">智能空调</div>
+                                </div>
+                                <div class="device-item" data-device="curtain" data-space="bedroom" data-category="automation">
+                                    <div class="device-icon">🚪</div>
+                                    <div class="device-name">智能窗帘</div>
+                                </div>
+                                <div class="device-item" data-device="bed" data-space="bedroom" data-category="furniture">
+                                    <div class="device-icon">🛏️</div>
+                                    <div class="device-name">智能床</div>
+                                </div>
+                                <div class="device-item" data-device="speaker" data-space="bedroom" data-category="entertainment">
+                                    <div class="device-icon">🔊</div>
+                                    <div class="device-name">智能音箱</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 次卧设备 -->
+                        <div class="category" data-space="secondary-bedroom">
+                            <h4>次卧设备</h4>
+                            <div class="device-grid">
+                                <div class="device-item" data-device="lighting" data-space="secondary-bedroom" data-category="lighting">
+                                    <div class="device-icon">💡</div>
+                                    <div class="device-name">智能照明</div>
+                                </div>
+                                <div class="device-item" data-device="air-conditioner" data-space="secondary-bedroom" data-category="climate">
+                                    <div class="device-icon">❄️</div>
+                                    <div class="device-name">智能空调</div>
+                                </div>
+                                <div class="device-item" data-device="curtain" data-space="secondary-bedroom" data-category="automation">
+                                    <div class="device-icon">🚪</div>
+                                    <div class="device-name">智能窗帘</div>
+                                </div>
+                                <div class="device-item" data-device="desk-lamp" data-space="secondary-bedroom" data-category="lighting">
+                                    <div class="device-icon">🪔</div>
+                                    <div class="device-name">智能台灯</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 卫生间设备 -->
+                        <div class="category" data-space="bathroom">
+                            <h4>卫生间设备</h4>
+                            <div class="device-grid">
+                                <div class="device-item" data-device="lighting" data-space="bathroom" data-category="lighting">
+                                    <div class="device-icon">💡</div>
+                                    <div class="device-name">智能照明</div>
+                                </div>
+                                <div class="device-item" data-device="toilet" data-space="bathroom" data-category="appliance">
+                                    <div class="device-icon">🚽</div>
+                                    <div class="device-name">智能马桶</div>
+                                </div>
+                                <div class="device-item" data-device="shower" data-space="bathroom" data-category="appliance">
+                                    <div class="device-icon">🚿</div>
+                                    <div class="device-name">智能淋浴</div>
+                                </div>
+                                <div class="device-item" data-device="exhaust" data-space="bathroom" data-category="appliance">
+                                    <div class="device-icon">🌬️</div>
+                                    <div class="device-name">智能排气扇</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 阳台设备 -->
+                        <div class="category" data-space="balcony">
+                            <h4>阳台设备</h4>
+                            <div class="device-grid">
+                                <div class="device-item" data-device="washing-machine" data-space="balcony" data-category="appliance">
+                                    <div class="device-icon">🧺</div>
+                                    <div class="device-name">智能洗衣机</div>
+                                </div>
+                                <div class="device-item" data-device="dryer" data-space="balcony" data-category="appliance">
+                                    <div class="device-icon">☀️</div>
+                                    <div class="device-name">智能烘干机</div>
+                                </div>
+                                <div class="device-item" data-device="curtain" data-space="balcony" data-category="automation">
+                                    <div class="device-icon">🚪</div>
+                                    <div class="device-name">智能窗帘</div>
+                                </div>
+                                <div class="device-item" data-device="lighting" data-space="balcony" data-category="lighting">
+                                    <div class="device-icon">💡</div>
+                                    <div class="device-name">智能照明</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="design-info">
+                        <div class="info-item">
+                            <span class="info-label">已添加设备:</span>
+                            <span class="info-value" id="device-count">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">已覆盖房间:</span>
+                            <span class="info-value" id="room-coverage">0/0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">系统评分:</span>
+                            <span class="info-value" id="system-score">0/100</span>
+                        </div>
+                    </div>
+                    
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果模态框 -->
+    <div class="result-modal" id="result-modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modal-title">设计结果</h2>
+            <div class="modal-stats">
+                <div class="stat-item correct-stat">
+                    <span class="stat-value" id="total-devices">0</span>
+                    <span class="stat-label">设备总数</span>
+                </div>
+                <div class="stat-item correct-stat">
+                    <span class="stat-value" id="covered-rooms">0</span>
+                    <span class="stat-label">覆盖房间</span>
+                </div>
+                <div class="stat-item correct-stat">
+                    <span class="stat-value" id="final-score">0</span>
+                    <span class="stat-label">系统评分</span>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeModal()">关闭</button>
+                <button class="control-btn primary" onclick="resetDesign()">重新设计</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // 户型数据 - 重新设计，确保房间均匀分布在户型图中间
+    const houseTypes = {
+        'one-room': {
+            name: '一室一厅（50㎡）',
+            rooms: [
+                { id: 'living-room', name: '客厅', x: 50, y: 50, width: 400, height: 250 },
+                { id: 'bedroom', name: '主卧', x: 50, y: 320, width: 300, height: 250 },
+                { id: 'kitchen', name: '厨房', x: 370, y: 320, width: 200, height: 150 },
+                { id: 'bathroom', name: '卫生间', x: 370, y: 490, width: 200, height: 120 },
+                { id: 'balcony', name: '阳台', x: 590, y: 320, width: 150, height: 290 }
+            ]
+        },
+        'two-room': {
+            name: '两室一厅（75㎡）',
+            rooms: [
+                { id: 'living-room', name: '客厅', x: 50, y: 50, width: 350, height: 250 },
+                { id: 'bedroom', name: '主卧', x: 420, y: 50, width: 250, height: 200 },
+                { id: 'secondary-bedroom', name: '次卧', x: 420, y: 270, width: 250, height: 200 },
+                { id: 'kitchen', name: '厨房', x: 50, y: 320, width: 220, height: 150 },
+                { id: 'bathroom', name: '卫生间', x: 290, y: 320, width: 120, height: 150 },
+                { id: 'balcony', name: '阳台', x: 690, y: 50, width: 150, height: 250 }
+            ]
+        },
+        'three-room': {
+            name: '三室一厅（89㎡）',
+            rooms: [
+                { id: 'living-room', name: '客厅', x: 50, y: 50, width: 380, height: 250 },
+                { id: 'bedroom', name: '主卧', x: 450, y: 50, width: 220, height: 200 },
+                { id: 'secondary-bedroom', name: '次卧1', x: 450, y: 270, width: 180, height: 200 },
+                { id: 'secondary-bedroom-2', name: '次卧2', x: 650, y: 270, width: 180, height: 200 },
+                { id: 'kitchen', name: '厨房', x: 50, y: 320, width: 220, height: 150 },
+                { id: 'bathroom', name: '卫生间', x: 290, y: 320, width: 140, height: 150 },
+                { id: 'balcony', name: '阳台', x: 690, y: 50, width: 150, height: 200 }
+            ]
+        },
+        'three-room-two-hall': {
+            name: '三室两厅（120㎡）',
+            rooms: [
+                { id: 'living-room', name: '客厅', x: 50, y: 50, width: 300, height: 250 },
+                { id: 'dining-room', name: '餐厅', x: 370, y: 50, width: 200, height: 250 },
+                { id: 'bedroom', name: '主卧', x: 590, y: 50, width: 200, height: 200 },
+                { id: 'secondary-bedroom', name: '次卧1', x: 590, y: 270, width: 150, height: 200 },
+                { id: 'secondary-bedroom-2', name: '次卧2', x: 760, y: 270, width: 150, height: 200 },
+                { id: 'kitchen', name: '厨房', x: 50, y: 320, width: 250, height: 180 },
+                { id: 'bathroom', name: '卫生间', x: 320, y: 320, width: 150, height: 180 },
+                { id: 'balcony1', name: '阳台1', x: 760, y: 50, width: 150, height: 200 },
+                { id: 'balcony2', name: '生活阳台', x: 50, y: 520, width: 420, height: 100 }
+            ]
+        }
+    };
+    
+    // 当前户型
+    let currentHouseType = 'one-room';
+    
+    // 设备数据
+    const devices = [];
+    let deviceId = 1;
+    
+    // 游戏状态
+    let gameState = {
+        devices: [],
+        selectedDevice: null, // 选中的设备（从设备库）
+        selectedPlacedDevice: null, // 选中的已放置设备
+        isDragging: false, // 是否正在拖拽
+        dragStart: null
+    };
+    
+    // DOM元素
+    const houseLayout = document.getElementById('house-layout');
+    const deviceCountElement = document.getElementById('device-count');
+    const roomCoverageElement = document.getElementById('room-coverage');
+    const systemScoreElement = document.getElementById('system-score');
+    const resultModal = document.getElementById('result-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const totalDevicesElement = document.getElementById('total-devices');
+    const coveredRoomsElement = document.getElementById('covered-rooms');
+    const finalScoreElement = document.getElementById('final-score');
+    
+    // 初始化
+    function init() {
+        // 加载默认户型
+        loadHouseType(currentHouseType);
+        
+        // 添加户型选择事件
+        document.querySelectorAll('.house-type-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.house-type-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentHouseType = this.dataset.type;
+                loadHouseType(currentHouseType);
+            });
+        });
+        
+        // 添加空间标签事件
+        document.querySelectorAll('.space-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.space-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const space = this.dataset.space;
+                filterDevicesBySpace(space);
+            });
+        });
+        
+        // 添加设备选择事件（从设备库）
+        document.querySelectorAll('.device-item').forEach(item => {
+            item.addEventListener('click', selectDevice);
+        });
+        
+        // 添加房屋点击事件（放置设备）
+        houseLayout.addEventListener('click', handleHouseClick);
+        
+        // 添加户型图拖拽事件（移动已放置的设备）
+        houseLayout.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', onDrag);
+        document.addEventListener('mouseup', endDrag);
+        
+
+        
+        // 初始化设计
+        resetDesign();
+    }
+    
+    // 加载户型
+    function loadHouseType(houseType) {
+        const houseData = houseTypes[houseType];
+        if (!houseData) return;
+        
+        // 清空布局
+        houseLayout.innerHTML = '';
+        
+        // 清除背景图片
+        houseLayout.style.backgroundImage = 'none';
+        
+        // 生成房间
+        houseData.rooms.forEach(room => {
+            const roomElement = document.createElement('div');
+            roomElement.className = 'room';
+            roomElement.id = room.id;
+            roomElement.style.left = room.x + 'px';
+            roomElement.style.top = room.y + 'px';
+            roomElement.style.width = room.width + 'px';
+            roomElement.style.height = room.height + 'px';
+            roomElement.innerHTML = '<span class="room-name">' + room.name + '</span>';
+            houseLayout.appendChild(roomElement);
+        });
+        
+        // 重置设计
+        resetDesign();
+    }
+    
+    // 按空间筛选设备
+    function filterDevicesBySpace(space) {
+        document.querySelectorAll('.category').forEach(category => {
+            if (space === 'all' || category.dataset.space === space) {
+                category.style.display = 'block';
+            } else {
+                category.style.display = 'none';
+            }
+        });
+    }
+    
+    // 按空间筛选设备
+    function filterDevicesBySpace(space) {
+        document.querySelectorAll('.category').forEach(category => {
+            if (space === 'all' || category.dataset.space === space) {
+                category.style.display = 'block';
+            } else {
+                category.style.display = 'none';
+            }
+        });
+    }
+    
+    // 选择设备（从设备库）
+    function selectDevice(e) {
+        const deviceItem = e.target.closest('.device-item');
+        if (!deviceItem) return;
+        
+        // 清除之前的选中状态
+        document.querySelectorAll('.device-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        // 选中当前设备
+        deviceItem.classList.add('selected');
+        
+        gameState.selectedDevice = {
+            type: deviceItem.dataset.device,
+            space: deviceItem.dataset.space,
+            category: deviceItem.dataset.category,
+            icon: deviceItem.querySelector('.device-icon').textContent,
+            name: deviceItem.querySelector('.device-name').textContent
+        };
+        
+        // 清除已放置设备的选中状态
+        if (gameState.selectedPlacedDevice) {
+            clearSelectedPlacedDevice();
+        }
+        
+        // 显示提示
+        console.log(`已选择：${gameState.selectedDevice.name}，请点击房间内位置放置`);
+    }
+    
+    // 清除已放置设备的选中状态
+    function clearSelectedPlacedDevice() {
+        if (gameState.selectedPlacedDevice) {
+            const deviceElement = document.getElementById(gameState.selectedPlacedDevice.id);
+            if (deviceElement) {
+                // 移除删除按钮
+                const deleteBtn = deviceElement.querySelector('.delete-btn');
+                if (deleteBtn) {
+                    deleteBtn.remove();
+                }
+                // 移除选中样式
+                deviceElement.classList.remove('selected');
+            }
+            gameState.selectedPlacedDevice = null;
+        }
+    }
+    
+    // 选中已放置的设备
+    function selectPlacedDevice(e) {
+        const deviceElement = e.target.closest('.device');
+        if (!deviceElement) return;
+        
+        e.stopPropagation();
+        
+        // 清除设备库的选中状态
+        document.querySelectorAll('.device-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        gameState.selectedDevice = null;
+        
+        // 清除之前的选中状态
+        clearSelectedPlacedDevice();
+        
+        // 找到对应的设备
+        const deviceId = deviceElement.id;
+        const device = devices.find(d => d.id === deviceId);
+        if (device) {
+            gameState.selectedPlacedDevice = device;
+            
+            // 添加选中样式
+            deviceElement.classList.add('selected');
+            
+            // 添加删除按钮
+            let deleteBtn = deviceElement.querySelector('.delete-btn');
+            if (!deleteBtn) {
+                deleteBtn = document.createElement('div');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '−';
+                deleteBtn.style.position = 'absolute';
+                deleteBtn.style.top = '-10px';
+                deleteBtn.style.right = '-10px';
+                deleteBtn.style.width = '20px';
+                deleteBtn.style.height = '20px';
+                deleteBtn.style.background = 'red';
+                deleteBtn.style.color = 'white';
+                deleteBtn.style.borderRadius = '50%';
+                deleteBtn.style.display = 'flex';
+                deleteBtn.style.alignItems = 'center';
+                deleteBtn.style.justifyContent = 'center';
+                deleteBtn.style.cursor = 'pointer';
+                deleteBtn.style.fontSize = '14px';
+                deleteBtn.style.fontWeight = 'bold';
+                deleteBtn.style.zIndex = '101';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteDevice(device.id);
+                });
+                deviceElement.appendChild(deleteBtn);
+            }
+            
+            // 显示提示
+            console.log(`已选中：${device.name}，可拖拽移动位置`);
+            
+            // 显示设备控制面板
+            showDeviceControls(device);
+        }
+    }
+    
+    // 开始拖拽已放置的设备
+    function startDrag(e) {
+        if (gameState.selectedPlacedDevice) {
+            gameState.isDragging = true;
+            gameState.dragStart = {
+                x: e.clientX,
+                y: e.clientY,
+                deviceX: gameState.selectedPlacedDevice.x,
+                deviceY: gameState.selectedPlacedDevice.y
+            };
+        }
+    }
+    
+    // 拖拽中
+    function onDrag(e) {
+        if (gameState.isDragging && gameState.selectedPlacedDevice) {
+            const deviceElement = document.getElementById(gameState.selectedPlacedDevice.id);
+            if (deviceElement) {
+                const deltaX = e.clientX - gameState.dragStart.x;
+                const deltaY = e.clientY - gameState.dragStart.y;
+                
+                const rect = houseLayout.getBoundingClientRect();
+                const newX = gameState.dragStart.deviceX + deltaX;
+                const newY = gameState.dragStart.deviceY + deltaY;
+                
+                // 限制在户型图内
+                const limitedX = Math.max(20, Math.min(rect.width - 40, newX));
+                const limitedY = Math.max(20, Math.min(rect.height - 40, newY));
+                
+                // 更新设备位置
+                deviceElement.style.left = (limitedX - 20) + 'px';
+                deviceElement.style.top = (limitedY - 20) + 'px';
+                
+                // 预览新位置
+                gameState.selectedPlacedDevice.x = limitedX;
+                gameState.selectedPlacedDevice.y = limitedY;
+            }
+        }
+    }
+    
+    // 结束拖拽
+    function endDrag(e) {
+        if (gameState.isDragging && gameState.selectedPlacedDevice) {
+            gameState.isDragging = false;
+            
+            // 检查新位置所在的房间
+            const room = getRoomAtPosition(gameState.selectedPlacedDevice.x, gameState.selectedPlacedDevice.y);
+            if (room) {
+                // 更新设备所在房间
+                gameState.selectedPlacedDevice.roomId = room.id;
+                
+                // 更新设备元素的类
+                const deviceElement = document.getElementById(gameState.selectedPlacedDevice.id);
+                if (deviceElement) {
+                    // 移除旧的房间类
+                    deviceElement.className = deviceElement.className.replace(/room-\w+/g, '');
+                    // 添加新的房间类
+                    deviceElement.classList.add(`room-${room.id}`);
+                }
+            }
+            
+            // 显示提示
+            console.log(`设备已移动到新位置`);
+        }
+    }
+    
+    // 删除设备
+    function deleteDevice(deviceId) {
+        // 从设备数组中删除
+        const index = devices.findIndex(d => d.id === deviceId);
+        if (index > -1) {
+            devices.splice(index, 1);
+        }
+        
+        // 从DOM中删除
+        const deviceElement = document.getElementById(deviceId);
+        if (deviceElement) {
+            deviceElement.remove();
+        }
+        
+        // 清除选中状态
+        if (gameState.selectedPlacedDevice && gameState.selectedPlacedDevice.id === deviceId) {
+            gameState.selectedPlacedDevice = null;
+        }
+        
+        // 更新设计信息
+        updateDesignInfo();
+        
+        // 显示提示
+        console.log(`设备已删除`);
+    }
+    
+    // 重命名设备
+    function renameDevice(deviceId) {
+        const device = devices.find(d => d.id === deviceId);
+        if (device) {
+            const newName = prompt('请输入新的设备名称:', device.name);
+            if (newName && newName.trim() !== '') {
+                device.name = newName.trim();
+                
+                // 更新设备元素的标题
+                const deviceElement = document.getElementById(deviceId);
+                if (deviceElement) {
+                    deviceElement.title = device.name;
+                }
+                
+                // 关闭现有的控制面板
+                const existingControls = document.querySelector('.device-controls');
+                if (existingControls) {
+                    existingControls.remove();
+                }
+                
+                // 显示提示
+                console.log(`设备已重命名为：${device.name}`);
+            }
+        }
+    }
+    
+    // 新增设备
+    function addNewDevice() {
+        // 创建新增设备模态框
+        const modal = document.createElement('div');
+        modal.className = 'result-modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2 class="modal-title">新增设备</h2>
+                <div style="margin: 30px 0; text-align: left;">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px;">设备名称:</label>
+                        <input type="text" id="new-device-name" placeholder="请输入设备名称" style="width: 100%; padding: 8px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px;">设备类型:</label>
+                        <input type="text" id="new-device-type" placeholder="请输入设备类型" style="width: 100%; padding: 8px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px;">所属空间:</label>
+                        <select id="new-device-space" style="width: 100%; padding: 8px;">
+                            <option value="living-room">客厅</option>
+                            <option value="kitchen">厨房</option>
+                            <option value="bedroom">主卧</option>
+                            <option value="secondary-bedroom">次卧</option>
+                            <option value="bathroom">卫生间</option>
+                            <option value="balcony">阳台</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px;">设备图标:</label>
+                        <input type="text" id="new-device-icon" placeholder="请输入设备图标（如：📺）" style="width: 100%; padding: 8px;">
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button class="control-btn" onclick="this.closest('.result-modal').remove()">取消</button>
+                    <button class="control-btn primary" onclick="saveNewDevice()">保存</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    // 保存新设备
+    function saveNewDevice() {
+        const name = document.getElementById('new-device-name').value.trim();
+        const type = document.getElementById('new-device-type').value.trim();
+        const space = document.getElementById('new-device-space').value;
+        const icon = document.getElementById('new-device-icon').value.trim();
+        
+        if (!name || !type || !icon) {
+            alert('请填写完整的设备信息');
+            return;
+        }
+        
+        // 找到对应空间的设备类别
+        const category = document.querySelector(`.category[data-space="${space}"] .device-grid`);
+        if (category) {
+            // 创建设备项
+            const deviceItem = document.createElement('div');
+            deviceItem.className = 'device-item';
+            deviceItem.dataset.device = type;
+            deviceItem.dataset.space = space;
+            deviceItem.dataset.category = 'custom';
+            deviceItem.innerHTML = `
+                <div class="device-icon">${icon}</div>
+                <div class="device-name">${name}</div>
+            `;
+            deviceItem.addEventListener('click', selectDevice);
+            
+            // 添加到设备库
+            category.appendChild(deviceItem);
+            
+            // 关闭模态框
+            document.querySelector('.result-modal').remove();
+            
+            // 显示提示
+            console.log(`设备 ${name} 已添加到设备库`);
+        }
+    }
+    
+    // 3D模型生成
+    let scene, camera, renderer, controls;
+    let model3DModal;
+    
+    function generate3DModel() {
+        if (devices.length === 0) {
+            alert('请先添加设备');
+            return;
+        }
+        
+        // 创建3D模型模态框
+        if (!model3DModal) {
+            model3DModal = document.createElement('div');
+            model3DModal.className = 'result-modal';
+            model3DModal.style.display = 'flex';
+            model3DModal.innerHTML = `
+                <div class="modal-content" style="max-width: 900px;">
+                    <h2 class="modal-title">3D模型预览</h2>
+                    <div style="background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                        <div style="width: 100%; height: 600px; position: relative;">
+                            <div id="model-container" style="width: 100%; height: 100%;"></div>
+                            <div style="position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 5px; z-index: 10;">
+                                <p>鼠标拖动：旋转模型</p>
+                                <p>滚轮：缩放模型</p>
+                                <p>右键拖动：平移模型</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="control-btn" onclick="close3DModel()">关闭</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(model3DModal);
+        } else {
+            model3DModal.style.display = 'flex';
+        }
+        
+        // 初始化3D场景
+        init3DScene();
+    }
+    
+    function init3DScene() {
+        const container = document.getElementById('model-container');
+        if (!container) return;
+        
+        // 清空容器
+        container.innerHTML = '';
+        
+        // 创建场景
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf0f8ff);
+        
+        // 获取容器尺寸
+        const containerRect = container.getBoundingClientRect();
+        const width = containerRect.width;
+        const height = containerRect.height;
+        
+        // 创建相机
+        camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+        camera.position.set(5, 5, 5);
+        camera.lookAt(0, 0, 0);
+        
+        // 创建渲染器
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(width, height);
+        renderer.shadowMap.enabled = true;
+        container.appendChild(renderer.domElement);
+        
+        // 添加控制器
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        
+        // 添加灯光
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(10, 10, 5);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+        
+        // 生成3D户型
+        generateHouse3D();
+        
+        // 生成3D设备
+        generateDevices3D();
+        
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+    }
+    
+    function generateHouse3D() {
+        const houseData = houseTypes[currentHouseType];
+        if (!houseData) return;
+        
+        houseData.rooms.forEach(room => {
+            // 计算3D尺寸
+            const width = room.width / 100;
+            const depth = room.height / 100;
+            const height = 0.5; // 房间高度
+            
+            // 计算3D位置
+            const x = (room.x + room.width / 2) / 100 - 5; // 居中
+            const z = (room.y + room.height / 2) / 100 - 3.5; // 居中
+            const y = height / 2;
+            
+            // 创建房间地板
+            const floorGeometry = new THREE.BoxGeometry(width, 0.05, depth);
+            const floorMaterial = new THREE.MeshStandardMaterial({
+                color: 0xdddddd,
+                metalness: 0.1,
+                roughness: 0.8
+            });
+            const floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+            floorMesh.position.set(x, 0, z);
+            floorMesh.receiveShadow = true;
+            scene.add(floorMesh);
+            
+            // 创建房间墙壁
+            const wallHeight = height - 0.05;
+            
+            // 后墙
+            const backWallGeometry = new THREE.BoxGeometry(width, wallHeight, 0.05);
+            const backWallMaterial = new THREE.MeshStandardMaterial({
+                color: 0xf5f5f5, // 米白色墙壁
+                metalness: 0.1,
+                roughness: 0.8
+            });
+            const backWall = new THREE.Mesh(backWallGeometry, backWallMaterial);
+            backWall.position.set(x, wallHeight / 2, z - depth / 2);
+            backWall.receiveShadow = true;
+            scene.add(backWall);
+            
+            // 前墙
+            const frontWall = new THREE.Mesh(backWallGeometry, backWallMaterial);
+            frontWall.position.set(x, wallHeight / 2, z + depth / 2);
+            frontWall.receiveShadow = true;
+            scene.add(frontWall);
+            
+            // 左墙
+            const leftWallGeometry = new THREE.BoxGeometry(0.05, wallHeight, depth);
+            const leftWall = new THREE.Mesh(leftWallGeometry, backWallMaterial);
+            leftWall.position.set(x - width / 2, wallHeight / 2, z);
+            leftWall.receiveShadow = true;
+            scene.add(leftWall);
+            
+            // 右墙
+            const rightWall = new THREE.Mesh(leftWallGeometry, backWallMaterial);
+            rightWall.position.set(x + width / 2, wallHeight / 2, z);
+            rightWall.receiveShadow = true;
+            scene.add(rightWall);
+            
+            // 添加房间标签
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 64;
+            const context = canvas.getContext('2d');
+            context.fillStyle = '#ffffff';
+            context.fillRect(0, 0, 256, 64);
+            context.fillStyle = '#333333';
+            context.font = '24px Arial';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText(room.name, 128, 32);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const labelGeometry = new THREE.PlaneGeometry(0.5, 0.12);
+            const labelMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+            const label = new THREE.Mesh(labelGeometry, labelMaterial);
+            label.position.set(x, height + 0.05, z);
+            label.lookAt(camera.position);
+            scene.add(label);
+        });
+    }
+    
+    function generateDevices3D() {
+        devices.forEach(device => {
+            // 计算3D位置
+            const x = (device.x) / 100 - 5; // 居中
+            const z = (device.y) / 100 - 3.5; // 居中
+            const y = 0.2; // 设备高度
+            
+            // 创建设备
+            let geometry, material;
+            
+            switch (device.type) {
+                case 'tv':
+                case 'smart-tv':
+                    // 挂在墙上的电视
+                    geometry = new THREE.BoxGeometry(0.6, 0.05, 0.35);
+                    material = new THREE.MeshStandardMaterial({ color: 0x1a1a1a });
+                    break;
+                case 'air-conditioner':
+                    // 空调
+                    geometry = new THREE.BoxGeometry(0.3, 0.2, 0.1);
+                    material = new THREE.MeshStandardMaterial({ color: 0x666666 });
+                    break;
+                case 'speaker':
+                case 'smart-speaker':
+                    // 音箱
+                    geometry = new THREE.CylinderGeometry(0.1, 0.1, 0.2, 16);
+                    material = new THREE.MeshStandardMaterial({ color: 0x333333 });
+                    break;
+                case 'curtain':
+                case 'smart-curtain':
+                    // 窗帘
+                    geometry = new THREE.BoxGeometry(0.8, 0.4, 0.02);
+                    material = new THREE.MeshStandardMaterial({ color: 0xcccccc, transparent: true, opacity: 0.7 });
+                    break;
+                case 'lighting':
+                case 'smart-light':
+                    // 照明
+                    geometry = new THREE.SphereGeometry(0.1, 16, 16);
+                    material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.5 });
+                    break;
+                case 'sofa':
+                case 'smart-sofa':
+                    // 沙发
+                    geometry = new THREE.BoxGeometry(0.8, 0.4, 0.4);
+                    material = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+                    break;
+                case 'refrigerator':
+                case 'smart-fridge':
+                    // 冰箱
+                    geometry = new THREE.BoxGeometry(0.6, 0.8, 0.6);
+                    material = new THREE.MeshStandardMaterial({ color: 0x87ceeb });
+                    break;
+                case 'oven':
+                case 'smart-oven':
+                    // 烤箱
+                    geometry = new THREE.BoxGeometry(0.4, 0.5, 0.4);
+                    material = new THREE.MeshStandardMaterial({ color: 0x999999 });
+                    break;
+                case 'dishwasher':
+                case 'smart-dishwasher':
+                    // 洗碗机
+                    geometry = new THREE.BoxGeometry(0.6, 0.4, 0.6);
+                    material = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
+                    break;
+                case 'hood':
+                case 'smart-cooktop':
+                    // 油烟机
+                    geometry = new THREE.BoxGeometry(0.8, 0.2, 0.6);
+                    material = new THREE.MeshStandardMaterial({ color: 0x333333 });
+                    break;
+                case 'bed':
+                case 'smart-bed':
+                    // 床
+                    geometry = new THREE.BoxGeometry(1.8, 0.5, 2.0);
+                    material = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+                    break;
+                case 'desk-lamp':
+                    // 台灯
+                    geometry = new THREE.CylinderGeometry(0.05, 0.1, 0.4, 16);
+                    material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+                    break;
+                case 'toilet':
+                case 'smart-toilet':
+                    // 马桶
+                    geometry = new THREE.BoxGeometry(0.6, 0.4, 0.8);
+                    material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+                    break;
+                case 'shower':
+                case 'smart-shower':
+                    // 淋浴
+                    geometry = new THREE.CylinderGeometry(0.1, 0.1, 0.8, 16);
+                    material = new THREE.MeshStandardMaterial({ color: 0x888888 });
+                    break;
+                case 'exhaust':
+                case 'smart-exhaust':
+                    // 排气扇
+                    geometry = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 16);
+                    material = new THREE.MeshStandardMaterial({ color: 0x666666 });
+                    break;
+                case 'washing-machine':
+                case 'smart-washing-machine':
+                    // 洗衣机
+                    geometry = new THREE.BoxGeometry(0.6, 0.8, 0.6);
+                    material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+                    break;
+                case 'dryer':
+                case 'smart-dryer':
+                    // 烘干机
+                    geometry = new THREE.BoxGeometry(0.6, 0.6, 0.6);
+                    material = new THREE.MeshStandardMaterial({ color: 0xeeeeee });
+                    break;
+                default:
+                    // 默认设备
+                    geometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
+                    material = new THREE.MeshStandardMaterial({ color: 0x3498db });
+            }
+            
+            const deviceMesh = new THREE.Mesh(geometry, material);
+            deviceMesh.position.set(x, y, z);
+            deviceMesh.castShadow = true;
+            deviceMesh.receiveShadow = true;
+            scene.add(deviceMesh);
+        });
+    }
+    
+    function close3DModel() {
+        if (model3DModal) {
+            model3DModal.style.display = 'none';
+        }
+        // 清理3D资源
+        if (scene) {
+            scene.traverse(function(object) {
+                if (object.geometry) object.geometry.dispose();
+                if (object.material) {
+                    if (Array.isArray(object.material)) {
+                        object.material.forEach(material => material.dispose());
+                    } else {
+                        object.material.dispose();
+                    }
+                }
+            });
+        }
+        if (renderer) {
+            renderer.dispose();
+        }
+    }
+    
+    // 获取位置所在的房间
+    function getRoomAtPosition(x, y) {
+        const houseData = houseTypes[currentHouseType];
+        if (!houseData) return null;
+        
+        for (const room of houseData.rooms) {
+            // 直接使用像素值进行比较，因为房间使用绝对定位
+            if (x >= room.x && 
+                x <= (room.x + room.width) && 
+                y >= room.y && 
+                y <= (room.y + room.height)) {
+                return room;
+            }
+        }
+        return null;
+    }
+    
+    // 添加设备到房间
+    function addDeviceToRoom(roomId, x, y) {
+        // 验证设备是否可以放置在该房间
+        const deviceSpace = gameState.selectedDevice.space;
+        let isSpaceValid = false;
+        
+        // 映射设备空间到房间ID
+        const spaceToRooms = {
+            'living-room': ['living-room', 'dining-room'],
+            'kitchen': ['kitchen'],
+            'bedroom': ['bedroom'],
+            'secondary-bedroom': ['secondary-bedroom', 'secondary-bedroom-2'],
+            'bathroom': ['bathroom'],
+            'balcony': ['balcony', 'balcony1', 'balcony2']
+        };
+        
+        // 检查设备是否可以放置在当前房间
+        if (spaceToRooms[deviceSpace]) {
+            isSpaceValid = spaceToRooms[deviceSpace].includes(roomId);
+        }
+        
+        if (!isSpaceValid) {
+            console.log(`错误：${gameState.selectedDevice.name} 只能放置在 ${spaceToRooms[deviceSpace]?.join('、') || '对应空间'} 中`);
+            return;
+        }
+        
+        const device = {
+            id: 'device' + deviceId++,
+            type: gameState.selectedDevice.type,
+            space: gameState.selectedDevice.space,
+            category: gameState.selectedDevice.category,
+            icon: gameState.selectedDevice.icon,
+            name: gameState.selectedDevice.name,
+            roomId: roomId,
+            x: x,
+            y: y
+        };
+        
+        devices.push(device);
+        
+        // 创建设备元素
+        const deviceElement = document.createElement('div');
+        deviceElement.className = `device ${roomId}`;
+        deviceElement.id = device.id;
+        deviceElement.style.left = (x - 20) + 'px';
+        deviceElement.style.top = (y - 20) + 'px';
+        deviceElement.innerHTML = device.icon;
+        deviceElement.title = device.name;
+        deviceElement.style.cursor = 'pointer';
+        deviceElement.style.zIndex = '100';
+        deviceElement.addEventListener('click', selectPlacedDevice);
+        
+        houseLayout.appendChild(deviceElement);
+        updateDesignInfo();
+    }
+    
+    // 显示设备控制
+    function showDeviceControls(device) {
+        // 移除现有控制
+        const existingControls = document.querySelector('.device-controls');
+        if (existingControls) {
+            existingControls.remove();
+        }
+        
+        // 创建控制面板
+        const controls = document.createElement('div');
+        controls.className = 'device-controls';
+        controls.style.left = (device.x + 50) + 'px';
+        controls.style.top = (device.y - 50) + 'px';
+        
+        controls.innerHTML = `
+            <h4>${device.name}</h4>
+            <div class="control-toggle">
+                <span class="toggle-label">电源</span>
+                <div class="toggle-switch"></div>
+            </div>
+            <div class="control-rename">
+                <button class="control-btn secondary" onclick="renameDevice('${device.id}')">重命名</button>
+            </div>
+        `;
+        
+        // 添加亮度控制（如果是照明设备）
+        if (device.category === 'lighting') {
+            controls.innerHTML += `
+                <div>
+                    <label>亮度: <span id="brightness-value">50%</span></label>
+                    <input type="range" class="control-slider" min="0" max="100" value="50">
+                </div>
+            `;
+        }
+        
+        // 添加温度控制（如果是温控设备）
+        if (device.type === 'air-conditioner' || device.type === 'thermostat') {
+            controls.innerHTML += `
+                <div>
+                    <label>温度: <span id="temperature-value">22°C</span></label>
+                    <input type="range" class="control-slider" min="16" max="30" value="22">
+                </div>
+            `;
+        }
+        
+        houseLayout.appendChild(controls);
+        
+        // 添加切换事件
+        const toggleSwitch = controls.querySelector('.toggle-switch');
+        toggleSwitch.addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+        
+        // 添加滑块事件
+        const sliders = controls.querySelectorAll('.control-slider');
+        sliders.forEach(slider => {
+            slider.addEventListener('input', function() {
+                const valueElement = this.previousElementSibling.querySelector('span');
+                if (valueElement) {
+                    valueElement.textContent = this.value + (this.max > 100 ? '°C' : '%');
+                }
+            });
+        });
+        
+        // 点击其他地方关闭控制
+        setTimeout(() => {
+            document.addEventListener('click', function closeControls(e) {
+                if (!controls.contains(e.target) && !document.getElementById(device.id).contains(e.target)) {
+                    controls.remove();
+                    document.removeEventListener('click', closeControls);
+                }
+            });
+        }, 100);
+    }
+    
+    // 处理房屋点击
+    function handleHouseClick(e) {
+        // 移除现有控制
+        const existingControls = document.querySelector('.device-controls');
+        if (existingControls) {
+            existingControls.remove();
+        }
+        
+        // 如果有选中的设备（从设备库），则放置设备
+        if (gameState.selectedDevice) {
+            const rect = houseLayout.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // 检查是否在房间内
+            const room = getRoomAtPosition(x, y);
+            if (room) {
+                addDeviceToRoom(room.id, x, y);
+                
+                // 清除选中状态
+                document.querySelectorAll('.device-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                gameState.selectedDevice = null;
+                
+                // 显示提示
+                console.log(`设备已放置到 ${room.name}`);
+            }
+        }
+    }
+    
+    // 更新设计信息
+    function updateDesignInfo() {
+        const houseData = houseTypes[currentHouseType];
+        if (!houseData) return;
+        
+        // 更新设备数量
+        deviceCountElement.textContent = devices.length;
+        
+        // 更新房间覆盖
+        const coveredRooms = new Set(devices.map(device => device.roomId));
+        roomCoverageElement.textContent = `${coveredRooms.size}/${houseData.rooms.length}`;
+        
+        // 计算系统评分
+        let score = 0;
+        
+        // 基础分数 - 每个设备10分
+        score += devices.length * 10;
+        
+        // 房间覆盖分数 - 每个房间10分
+        score += coveredRooms.size * 10;
+        
+        // 设备多样性分数
+        const categories = new Set(devices.map(device => device.category));
+        score += categories.size * 5;
+        
+        // 上限100分
+        score = Math.min(100, score);
+        systemScoreElement.textContent = `${score}/100`;
+    }
+    
+
+    
+    // 检查设计
+    function checkDesign() {
+        const houseData = houseTypes[currentHouseType];
+        if (!houseData) return;
+        
+        const totalDevices = devices.length;
+        const coveredRooms = new Set(devices.map(device => device.roomId)).size;
+        
+        // 计算系统评分
+        let score = 0;
+        score += totalDevices * 10;
+        score += coveredRooms * 10;
+        const categories = new Set(devices.map(device => device.category));
+        score += categories.size * 5;
+        score = Math.min(100, score);
+        
+        // 更新模态框
+        totalDevicesElement.textContent = totalDevices;
+        coveredRoomsElement.textContent = `${coveredRooms}/${houseData.rooms.length}`;
+        finalScoreElement.textContent = score;
+        
+        if (score >= 80) {
+            modalTitle.textContent = '设计优秀！';
+        } else if (score >= 60) {
+            modalTitle.textContent = '设计良好';
+        } else {
+            modalTitle.textContent = '设计需要改进';
+        }
+        
+        // 显示模态框
+        resultModal.style.display = 'flex';
+    }
+    
+    // 重置设计
+    function resetDesign() {
+        // 清空设备
+        devices.length = 0;
+        deviceId = 1;
+        
+        // 清空DOM元素
+        document.querySelectorAll('.device').forEach(element => element.remove());
+        const existingControls = document.querySelector('.device-controls');
+        if (existingControls) {
+            existingControls.remove();
+        }
+        
+        // 更新设计信息
+        updateDesignInfo();
+        closeModal();
+    }
+    
+    // 关闭模态框
+    function closeModal() {
+        resultModal.style.display = 'none';
+    }
+    
+
+    
+
+    
+    // 初始化应用
+    init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电路模拟实验 - 学科模拟学习平台</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #3a506b, #1c2541);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            margin-top: 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .instructions {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #3a506b;
+            line-height: 1.6;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #3a506b;
+        }
+        
+        .level-selector {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #3a506b;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .level-selector h3 {
+            margin-top: 0;
+            color: #3a506b;
+            margin-bottom: 15px;
+        }
+        
+        .level-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .level-btn {
+            padding: 12px 24px;
+            border: 2px solid #3a506b;
+            border-radius: 8px;
+            background: white;
+            color: #3a506b;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .level-btn:hover {
+            background: #3a506b;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .level-btn.active {
+            background: #3a506b;
+            color: white;
+        }
+        
+        .circuit-board {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #3a506b;
+            position: relative;
+            min-height: 500px;
+        }
+        
+        .circuit-board h2 {
+            color: #3a506b;
+            border-bottom: 2px solid #99a3b3;
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+        
+        .board-content {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .circuit-area {
+            flex: 2;
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            min-height: 400px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .components-panel {
+            flex: 1;
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .components-panel h3 {
+            color: #3a506b;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .component {
+            background: white;
+            border: 2px solid #3a506b;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: grab;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .component:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .component.dragging {
+            opacity: 0.8;
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+        
+        .component-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .component-name {
+            font-weight: 600;
+            color: #3a506b;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 5px;
+            height: 100%;
+        }
+        
+        .grid-cell {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: white;
+            transition: all 0.3s;
+            position: relative;
+            min-height: 50px;
+        }
+        
+        .grid-cell:hover {
+            background: #e6f2ff;
+        }
+        
+        .grid-cell.occupied {
+            background: #f0f0f0;
+        }
+        
+        .bulb {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            border: 2px solid #3a506b;
+            position: relative;
+            margin: 0 auto;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .bulb.on {
+            background: #ffff00;
+            box-shadow: 0 0 15px #ffff00;
+        }
+        
+        .bulb:hover {
+            transform: scale(1.1);
+        }
+        
+        .switch {
+            width: 40px;
+            height: 20px;
+            background: #3a506b;
+            border-radius: 10px;
+            position: relative;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .switch::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        
+        .switch.on::after {
+            left: 22px;
+        }
+        
+        .switch.on {
+            background: #27ae60;
+        }
+        
+        .switch:hover {
+            transform: scale(1.1);
+        }
+        
+        .battery {
+            width: 30px;
+            height: 60px;
+            background: #e74c3c;
+            border-radius: 5px;
+            position: relative;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+        
+        .battery::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            background: #e74c3c;
+            top: -10px;
+            left: 10px;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .battery:hover {
+            transform: scale(1.1);
+        }
+        
+        .wire {
+            position: absolute;
+            background: #333;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        
+        .wire.horizontal {
+            height: 3px;
+        }
+        
+        .wire.vertical {
+            width: 3px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(145deg, #27ae60, #229954);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(39, 174, 96, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.4);
+        }
+        
+        .status {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid #3a506b;
+        }
+        
+        .status h3 {
+            color: #3a506b;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .delete-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+        
+        .connection-mode {
+            background: #e6f2ff;
+            border: 2px dashed #3498db;
+        }
+        
+        @media (max-width: 900px) {
+            .board-content {
+                flex-direction: column;
+            }
+            
+            .back-button {
+                position: static;
+                margin-bottom: 20px;
+            }
+            
+            .level-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='computer.html'">← 返回计算机学科</button>
+    
+    <div class="container">
+        <header>
+            <h1>电路模拟实验</h1>
+            <p class="subtitle">学习电路连接与设计</p>
+        </header>
+        
+        <div class="instructions">
+            <h3>实验说明</h3>
+            <p>本实验包含多个关卡，每个关卡需要你设计不同的电路连接。通过拖拽组件到电路板上，然后连接线路，最后点击「测试电路」按钮验证电路是否正确。</p>
+            <p>目标：根据关卡要求，设计电路使得特定的灯泡在特定的开关组合下亮起。</p>
+            <p>操作步骤：</p>
+            <ol>
+                <li>选择一个关卡</li>
+                <li>从右侧组件面板拖拽组件到电路板上</li>
+                <li>点击一个组件，然后点击另一个组件进行连接</li>
+                <li>点击组件上的红色叉号删除组件</li>
+                <li>点击「测试电路」按钮验证</li>
+                <li>点击「重置电路」按钮重新开始</li>
+            </ol>
+        </div>
+        
+        <div class="level-selector">
+            <h3>选择关卡</h3>
+            <div class="level-buttons">
+                <button class="level-btn active" data-level="1">关卡 1</button>
+                <button class="level-btn" data-level="2">关卡 2</button>
+                <button class="level-btn" data-level="3">关卡 3</button>
+                <button class="level-btn" data-level="4">关卡 4</button>
+                <button class="level-btn" data-level="5">关卡 5</button>
+            </div>
+        </div>
+        
+        <div class="circuit-board">
+            <h2>电路板</h2>
+            <div class="board-content">
+                <div class="circuit-area">
+                    <div class="grid" id="grid"></div>
+                </div>
+                <div class="components-panel">
+                    <h3>组件</h3>
+                    <div class="component" draggable="true" data-type="bulb">
+                        <span class="component-icon">💡</span>
+                        <span class="component-name">灯泡</span>
+                    </div>
+                    <div class="component" draggable="true" data-type="switch">
+                        <span class="component-icon">🔴</span>
+                        <span class="component-name">开关</span>
+                    </div>
+                    <div class="component" draggable="true" data-type="battery">
+                        <span class="component-icon">🔋</span>
+                        <span class="component-name">电池</span>
+                    </div>
+                    <div class="component" onclick="toggleWireMode()" id="wire-button">
+                        <span class="component-icon">🔌</span>
+                        <span class="component-name">导线</span>
+                    </div>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="testCircuit()">测试电路</button>
+                <button class="btn btn-danger" onclick="resetCircuit()">重置电路</button>
+                <button class="btn btn-success" onclick="checkSolution()">查看答案</button>
+            </div>
+        </div>
+        
+        <div class="status">
+            <h3>状态信息</h3>
+            <div class="status-message info" id="status-message">
+                请选择一个关卡开始实验
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const levels = [
+            {
+                id: 1,
+                name: "基础串联电路",
+                description: "设计一个串联电路，当开关1闭合时，灯泡1亮起",
+                components: [
+                    { type: "battery", x: 1, y: 4 },
+                    { type: "switch", x: 3, y: 4 },
+                    { type: "bulb", x: 7, y: 4 }
+                ],
+                connections: [
+                    { from: { type: "battery", x: 1, y: 4 }, to: { type: "switch", x: 3, y: 4 } },
+                    { from: { type: "switch", x: 3, y: 4 }, to: { type: "bulb", x: 7, y: 4 } },
+                    { from: { type: "bulb", x: 7, y: 4 }, to: { type: "battery", x: 1, y: 4 } }
+                ],
+                testCondition: (state) => {
+                    return state.switches[0].on === state.bulbs[0].on;
+                }
+            },
+            {
+                id: 2,
+                name: "并联电路",
+                description: "设计一个并联电路，当开关1闭合时，灯泡1和灯泡2都亮起",
+                components: [
+                    { type: "battery", x: 1, y: 3 },
+                    { type: "switch", x: 3, y: 3 },
+                    { type: "bulb", x: 5, y: 2 },
+                    { type: "bulb", x: 5, y: 4 }
+                ],
+                connections: [
+                    { from: { type: "battery", x: 1, y: 3 }, to: { type: "switch", x: 3, y: 3 } },
+                    { from: { type: "switch", x: 3, y: 3 }, to: { type: "bulb", x: 5, y: 2 } },
+                    { from: { type: "switch", x: 3, y: 3 }, to: { type: "bulb", x: 5, y: 4 } },
+                    { from: { type: "bulb", x: 5, y: 2 }, to: { type: "battery", x: 1, y: 3 } },
+                    { from: { type: "bulb", x: 5, y: 4 }, to: { type: "battery", x: 1, y: 3 } }
+                ],
+                testCondition: (state) => {
+                    return state.switches[0].on === state.bulbs[0].on && state.switches[0].on === state.bulbs[1].on;
+                }
+            },
+            {
+                id: 3,
+                name: "串联-并联混合",
+                description: "设计一个混合电路，当开关1和开关2都闭合时，灯泡1和灯泡2都亮起",
+                components: [
+                    { type: "battery", x: 1, y: 4 },
+                    { type: "switch", x: 3, y: 3 },
+                    { type: "switch", x: 3, y: 5 },
+                    { type: "bulb", x: 7, y: 3 },
+                    { type: "bulb", x: 7, y: 5 }
+                ],
+                connections: [
+                    { from: { type: "battery", x: 1, y: 4 }, to: { type: "switch", x: 3, y: 3 } },
+                    { from: { type: "switch", x: 3, y: 3 }, to: { type: "bulb", x: 7, y: 3 } },
+                    { from: { type: "battery", x: 1, y: 4 }, to: { type: "switch", x: 3, y: 5 } },
+                    { from: { type: "switch", x: 3, y: 5 }, to: { type: "bulb", x: 7, y: 5 } },
+                    { from: { type: "bulb", x: 7, y: 3 }, to: { type: "bulb", x: 7, y: 5 } },
+                    { from: { type: "bulb", x: 7, y: 5 }, to: { type: "battery", x: 1, y: 4 } }
+                ],
+                testCondition: (state) => {
+                    const bothSwitchesOn = state.switches[0].on && state.switches[1].on;
+                    return bothSwitchesOn === state.bulbs[0].on && bothSwitchesOn === state.bulbs[1].on;
+                }
+            },
+            {
+                id: 4,
+                name: "复杂逻辑电路",
+                description: "设计一个电路，当开关1闭合或开关2闭合时，灯泡1亮起",
+                components: [
+                    { type: "battery", x: 1, y: 4 },
+                    { type: "switch", x: 3, y: 3 },
+                    { type: "switch", x: 3, y: 5 },
+                    { type: "bulb", x: 7, y: 4 }
+                ],
+                connections: [
+                    { from: { type: "battery", x: 1, y: 4 }, to: { type: "switch", x: 3, y: 3 } },
+                    { from: { type: "battery", x: 1, y: 4 }, to: { type: "switch", x: 3, y: 5 } },
+                    { from: { type: "switch", x: 3, y: 3 }, to: { type: "bulb", x: 7, y: 4 } },
+                    { from: { type: "switch", x: 3, y: 5 }, to: { type: "bulb", x: 7, y: 4 } },
+                    { from: { type: "bulb", x: 7, y: 4 }, to: { type: "battery", x: 1, y: 4 } }
+                ],
+                testCondition: (state) => {
+                    const eitherSwitchOn = state.switches[0].on || state.switches[1].on;
+                    return eitherSwitchOn === state.bulbs[0].on;
+                }
+            },
+            {
+                id: 5,
+                name: "高级逻辑电路",
+                description: "设计一个电路，当开关1和开关2闭合且开关3断开时，灯泡1亮起",
+                components: [
+                    { type: "battery", x: 1, y: 4 },
+                    { type: "switch", x: 3, y: 3 },
+                    { type: "switch", x: 3, y: 4 },
+                    { type: "switch", x: 3, y: 5 },
+                    { type: "bulb", x: 7, y: 4 }
+                ],
+                connections: [
+                    { from: { type: "battery", x: 1, y: 4 }, to: { type: "switch", x: 3, y: 3 } },
+                    { from: { type: "switch", x: 3, y: 3 }, to: { type: "switch", x: 3, y: 4 } },
+                    { from: { type: "switch", x: 3, y: 4 }, to: { type: "bulb", x: 7, y: 4 } },
+                    { from: { type: "bulb", x: 7, y: 4 }, to: { type: "switch", x: 3, y: 5 } },
+                    { from: { type: "switch", x: 3, y: 5 }, to: { type: "battery", x: 1, y: 4 } }
+                ],
+                testCondition: (state) => {
+                    const condition = state.switches[0].on && state.switches[1].on && !state.switches[2].on;
+                    return condition === state.bulbs[0].on;
+                }
+            }
+        ];
+        
+        let currentLevel = 1;
+        let circuitState = {
+            components: [],
+            connections: [],
+            switches: [],
+            bulbs: []
+        };
+        
+        let connectionMode = false;
+        let connectionStart = null;
+        let wireMode = false;
+        
+        function initGrid() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            
+            for (let y = 0; y < 8; y++) {
+                for (let x = 0; x < 10; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.dataset.x = x;
+                    cell.dataset.y = y;
+                    cell.addEventListener('dragover', (e) => e.preventDefault());
+                    cell.addEventListener('drop', handleDrop);
+                    grid.appendChild(cell);
+                }
+            }
+        }
+        
+        function handleDragStart(e) {
+            const component = e.target.closest('.component');
+            if (component) {
+                component.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', component.dataset.type);
+            }
+        }
+        
+        function handleDragEnd(e) {
+            const component = e.target.closest('.component');
+            if (component) {
+                component.classList.remove('dragging');
+            }
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            const type = e.dataTransfer.getData('text/plain');
+            const cell = e.target.closest('.grid-cell');
+            
+            if (cell && !cell.classList.contains('occupied')) {
+                const x = parseInt(cell.dataset.x);
+                const y = parseInt(cell.dataset.y);
+                addComponent(type, x, y, cell);
+            }
+        }
+        
+        function addComponent(type, x, y, cell) {
+            cell.classList.add('occupied');
+            
+            let componentElement;
+            if (type === 'bulb') {
+                componentElement = document.createElement('div');
+                componentElement.className = 'bulb';
+                componentElement.dataset.type = 'bulb';
+                componentElement.dataset.x = x;
+                componentElement.dataset.y = y;
+                componentElement.dataset.id = circuitState.components.length;
+                
+                circuitState.bulbs.push({ id: circuitState.components.length, x, y, on: false });
+            } else if (type === 'switch') {
+                componentElement = document.createElement('div');
+                componentElement.className = 'switch';
+                componentElement.dataset.type = 'switch';
+                componentElement.dataset.x = x;
+                componentElement.dataset.y = y;
+                componentElement.dataset.id = circuitState.components.length;
+                componentElement.addEventListener('click', toggleSwitch);
+                
+                circuitState.switches.push({ id: circuitState.components.length, x, y, on: false });
+            } else if (type === 'battery') {
+                componentElement = document.createElement('div');
+                componentElement.className = 'battery';
+                componentElement.dataset.type = 'battery';
+                componentElement.dataset.x = x;
+                componentElement.dataset.y = y;
+                componentElement.dataset.id = circuitState.components.length;
+            }
+            
+            if (componentElement) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '×';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteComponent(componentElement);
+                });
+                
+                componentElement.addEventListener('click', (e) => {
+                    handleComponentClick(componentElement);
+                });
+                
+                componentElement.style.position = 'relative';
+                cell.appendChild(componentElement);
+                cell.appendChild(deleteBtn);
+                
+                circuitState.components.push({ id: circuitState.components.length, type, x, y, element: componentElement });
+            }
+        }
+        
+        function toggleWireMode() {
+            wireMode = !wireMode;
+            const wireButton = document.getElementById('wire-button');
+            if (wireMode) {
+                wireButton.style.background = '#3a506b';
+                wireButton.style.color = 'white';
+                document.getElementById('status-message').innerHTML = '🔌 已进入导线模式，请点击两个组件进行连接';
+                document.getElementById('status-message').className = 'status-message info';
+            } else {
+                wireButton.style.background = 'white';
+                wireButton.style.color = '#3a506b';
+                connectionMode = false;
+                connectionStart = null;
+                // 重置所有组件的样式
+                circuitState.components.forEach(comp => {
+                    comp.element.style.borderColor = '#3a506b';
+                    comp.element.style.boxShadow = '';
+                });
+                document.getElementById('status-message').innerHTML = '已退出导线模式';
+                document.getElementById('status-message').className = 'status-message info';
+            }
+        }
+        
+        function handleComponentClick(componentElement) {
+            if (wireMode) {
+                if (!connectionMode) {
+                    connectionMode = true;
+                    connectionStart = componentElement;
+                    componentElement.style.borderColor = '#3498db';
+                    componentElement.style.boxShadow = '0 0 10px #3498db';
+                    document.getElementById('status-message').innerHTML = '🔌 请点击第二个组件完成连接';
+                    document.getElementById('status-message').className = 'status-message info';
+                } else {
+                    if (connectionStart !== componentElement) {
+                        createConnection(connectionStart, componentElement);
+                        document.getElementById('status-message').innerHTML = '🔌 连接成功！请继续连接其他组件或点击导线按钮退出导线模式';
+                        document.getElementById('status-message').className = 'status-message success';
+                    }
+                    connectionMode = false;
+                    if (connectionStart) {
+                        connectionStart.style.borderColor = '#3a506b';
+                        connectionStart.style.boxShadow = '';
+                    }
+                    connectionStart = null;
+                }
+            }
+        }
+        
+        function createConnection(startComponent, endComponent) {
+            const startId = parseInt(startComponent.dataset.id);
+            const endId = parseInt(endComponent.dataset.id);
+            
+            const existingConnection = circuitState.connections.find(conn => 
+                (conn.from === startId && conn.to === endId) || 
+                (conn.from === endId && conn.to === startId)
+            );
+            
+            if (!existingConnection) {
+                circuitState.connections.push({ from: startId, to: endId });
+                drawConnection(startComponent, endComponent);
+                updateCircuit();
+            }
+        }
+        
+        function drawConnection(startComponent, endComponent) {
+            const startRect = startComponent.getBoundingClientRect();
+            const endRect = endComponent.getBoundingClientRect();
+            const circuitArea = document.querySelector('.circuit-area');
+            const areaRect = circuitArea.getBoundingClientRect();
+            
+            const startX = startRect.left + startRect.width / 2 - areaRect.left;
+            const startY = startRect.top + startRect.height / 2 - areaRect.top;
+            const endX = endRect.left + endRect.width / 2 - areaRect.left;
+            const endY = endRect.top + endRect.height / 2 - areaRect.top;
+            
+            // 创建SVG路径用于绘制圆滑的导线
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.position = 'absolute';
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+            svg.style.top = '0';
+            svg.style.left = '0';
+            svg.style.zIndex = '10';
+            svg.style.pointerEvents = 'none';
+            
+            // 计算控制点，使导线更加圆滑
+            const controlPoint1X = startX + (endX - startX) * 0.3;
+            const controlPoint1Y = startY;
+            const controlPoint2X = endX - (endX - startX) * 0.3;
+            const controlPoint2Y = endY;
+            
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', `M ${startX} ${startY} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${endX} ${endY}`);
+            path.setAttribute('stroke', '#333');
+            path.setAttribute('stroke-width', '3');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke-linecap', 'round');
+            path.setAttribute('stroke-linejoin', 'round');
+            
+            // 添加动画效果
+            path.style.opacity = '0';
+            path.style.transition = 'opacity 0.3s ease, stroke-dashoffset 0.5s ease';
+            path.style.strokeDasharray = '1000';
+            path.style.strokeDashoffset = '1000';
+            
+            svg.appendChild(path);
+            circuitArea.appendChild(svg);
+            
+            // 触发动画
+            setTimeout(() => {
+                path.style.opacity = '1';
+                path.style.strokeDashoffset = '0';
+            }, 10);
+        }
+        
+        function deleteComponent(componentElement) {
+            const id = parseInt(componentElement.dataset.id);
+            const cell = componentElement.closest('.grid-cell');
+            
+            if (cell) {
+                cell.classList.remove('occupied');
+                while (cell.firstChild) {
+                    cell.removeChild(cell.firstChild);
+                }
+                
+                circuitState.components = circuitState.components.filter(comp => comp.id !== id);
+                circuitState.switches = circuitState.switches.filter(sw => sw.id !== id);
+                circuitState.bulbs = circuitState.bulbs.filter(bulb => bulb.id !== id);
+                circuitState.connections = circuitState.connections.filter(conn => 
+                    conn.from !== id && conn.to !== id
+                );
+                
+                const circuitArea = document.querySelector('.circuit-area');
+                // 清除所有导线（包括旧的div导线和新的SVG导线）
+                document.querySelectorAll('.wire').forEach(wire => wire.remove());
+                document.querySelectorAll('svg').forEach(svg => svg.remove());
+                // 重新绘制剩余的连接
+                circuitState.connections.forEach(conn => {
+                    const startComponent = circuitState.components.find(comp => comp.id === conn.from)?.element;
+                    const endComponent = circuitState.components.find(comp => comp.id === conn.to)?.element;
+                    if (startComponent && endComponent) {
+                        drawConnection(startComponent, endComponent);
+                    }
+                });
+                
+                updateCircuit();
+            }
+        }
+        
+        function toggleSwitch(e) {
+            const switchElement = e.target.closest('.switch');
+            if (switchElement) {
+                const id = parseInt(switchElement.dataset.id);
+                const switchObj = circuitState.switches.find(s => s.id === id);
+                if (switchObj) {
+                    switchObj.on = !switchObj.on;
+                    switchElement.classList.toggle('on', switchObj.on);
+                    updateCircuit();
+                }
+            }
+        }
+        
+        function updateCircuit() {
+            circuitState.bulbs.forEach(bulb => {
+                bulb.on = isBulbPowered(bulb.id);
+                const bulbElement = document.querySelector(`.bulb[data-id="${bulb.id}"]`);
+                if (bulbElement) {
+                    bulbElement.classList.toggle('on', bulb.on);
+                }
+            });
+        }
+        
+        function isBulbPowered(bulbId) {
+            const graph = {};
+            circuitState.components.forEach(comp => {
+                graph[comp.id] = [];
+            });
+            circuitState.connections.forEach(conn => {
+                graph[conn.from].push(conn.to);
+                graph[conn.to].push(conn.from);
+            });
+            
+            const visited = new Set();
+            const queue = [];
+            
+            circuitState.components.forEach(comp => {
+                if (comp.type === 'battery') {
+                    queue.push(comp.id);
+                    visited.add(comp.id);
+                }
+            });
+            
+            while (queue.length > 0) {
+                const currentId = queue.shift();
+                
+                if (circuitState.components.find(comp => comp.id === currentId)?.type === 'bulb' && currentId === bulbId) {
+                    return true;
+                }
+                
+                const currentComp = circuitState.components.find(comp => comp.id === currentId);
+                if (currentComp?.type === 'switch') {
+                    const switchObj = circuitState.switches.find(sw => sw.id === currentId);
+                    if (!switchObj?.on) {
+                        continue;
+                    }
+                }
+                
+                graph[currentId].forEach(neighborId => {
+                    if (!visited.has(neighborId)) {
+                        visited.add(neighborId);
+                        queue.push(neighborId);
+                    }
+                });
+            }
+            
+            return false;
+        }
+        
+        function loadLevel(levelId) {
+            currentLevel = levelId;
+            const level = levels.find(l => l.id === levelId);
+            
+            if (level) {
+                resetCircuit();
+                
+                document.getElementById('status-message').innerHTML = `
+                    <strong>关卡 ${level.id}: ${level.name}</strong><br>
+                    ${level.description}
+                `;
+                document.getElementById('status-message').className = 'status-message info';
+                
+                level.components.forEach(component => {
+                    const cell = document.querySelector(`.grid-cell[data-x="${component.x}"][data-y="${component.y}"]`);
+                    if (cell) {
+                        addComponent(component.type, component.x, component.y, cell);
+                    }
+                });
+                
+                level.connections.forEach(connection => {
+                    const startComponent = circuitState.components.find(comp => 
+                        comp.type === connection.from.type && 
+                        comp.x === connection.from.x && 
+                        comp.y === connection.from.y
+                    );
+                    const endComponent = circuitState.components.find(comp => 
+                        comp.type === connection.to.type && 
+                        comp.x === connection.to.x && 
+                        comp.y === connection.to.y
+                    );
+                    
+                    if (startComponent && endComponent) {
+                        createConnection(startComponent.element, endComponent.element);
+                    }
+                });
+            }
+        }
+        
+        function testCircuit() {
+            const level = levels.find(l => l.id === currentLevel);
+            if (level) {
+                const result = level.testCondition(circuitState);
+                const statusMessage = document.getElementById('status-message');
+                
+                if (result) {
+                    statusMessage.innerHTML = '🎉 电路测试成功！';
+                    statusMessage.className = 'status-message success';
+                } else {
+                    statusMessage.innerHTML = '❌ 电路测试失败，请检查连接';
+                    statusMessage.className = 'status-message error';
+                }
+            }
+        }
+        
+        function resetCircuit() {
+            circuitState = {
+                components: [],
+                connections: [],
+                switches: [],
+                bulbs: []
+            };
+            
+            initGrid();
+            
+            // 清除所有导线（包括旧的div导线和新的SVG导线）
+            document.querySelectorAll('.wire').forEach(wire => wire.remove());
+            document.querySelectorAll('svg').forEach(svg => svg.remove());
+            
+            const level = levels.find(l => l.id === currentLevel);
+            if (level) {
+                document.getElementById('status-message').innerHTML = `
+                    <strong>关卡 ${level.id}: ${level.name}</strong><br>
+                    ${level.description}
+                `;
+                document.getElementById('status-message').className = 'status-message info';
+            }
+        }
+        
+        function checkSolution() {
+            const level = levels.find(l => l.id === currentLevel);
+            if (level) {
+                resetCircuit();
+                
+                level.components.forEach(component => {
+                    const cell = document.querySelector(`.grid-cell[data-x="${component.x}"][data-y="${component.y}"]`);
+                    if (cell) {
+                        addComponent(component.type, component.x, component.y, cell);
+                    }
+                });
+                
+                level.connections.forEach(connection => {
+                    const startComponent = circuitState.components.find(comp => 
+                        comp.type === connection.from.type && 
+                        comp.x === connection.from.x && 
+                        comp.y === connection.from.y
+                    );
+                    const endComponent = circuitState.components.find(comp => 
+                        comp.type === connection.to.type && 
+                        comp.x === connection.to.x && 
+                        comp.y === connection.to.y
+                    );
+                    
+                    if (startComponent && endComponent) {
+                        createConnection(startComponent.element, endComponent.element);
+                    }
+                });
+                
+                document.getElementById('status-message').innerHTML = '🔍 已加载答案电路';
+                document.getElementById('status-message').className = 'status-message info';
+            }
+        }
+        
+        function init() {
+            initGrid();
+            
+            document.querySelectorAll('.component').forEach(component => {
+                component.addEventListener('dragstart', handleDragStart);
+                component.addEventListener('dragend', handleDragEnd);
+            });
+            
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const levelId = parseInt(this.dataset.level);
+                    loadLevel(levelId);
+                });
+            });
+            
+            loadLevel(1);
+        }
+        
+        init();
+    </script>
+</body>
+</html>

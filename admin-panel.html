@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员控制面板 - 集成式学习平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            position: relative;
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #3a506b, #1c2541);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info span {
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e74c3c;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .panel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .panel-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .panel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .panel-card h2 {
+            color: #3a506b;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #3a506b;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .action-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+        }
+        
+        .panel-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .panel-section h2 {
+            color: #3a506b;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #3a506b;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .user-item {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .edit-btn,
+        .delete-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .edit-btn {
+            background: #3498db;
+            color: white;
+        }
+        
+        .edit-btn:hover {
+            background: #2980b9;
+        }
+        
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+        
+        .admin-features {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .admin-features h2 {
+            color: #3a506b;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-icon {
+            font-size: 1.5em;
+        }
+        
+        .feature-text {
+            font-size: 14px;
+        }
+        
+        .back-link {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .back-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 30px 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .panel-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="user-info" id="user-info">
+                <span>欢迎, 管理员</span>
+                <span class="role-badge">管理员</span>
+                <button class="logout-btn" onclick="logout()">退出登录</button>
+            </div>
+            <h1>管理员控制面板</h1>
+            <p class="subtitle">系统管理与开发设计权限</p>
+        </header>
+        
+        <div class="panel-grid">
+            <div class="panel-card">
+                <h2>系统统计</h2>
+                <div class="stat-item">
+                    <span class="stat-label">总用户数</span>
+                    <span class="stat-value">128</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">学生用户</span>
+                    <span class="stat-value">105</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">教师用户</span>
+                    <span class="stat-value">20</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">管理员用户</span>
+                    <span class="stat-value">3</span>
+                </div>
+                <button class="action-btn" onclick="viewDetailedStats()">查看详细统计</button>
+            </div>
+            
+            <div class="panel-card">
+                <h2>模块使用情况</h2>
+                <div class="stat-item">
+                    <span class="stat-label">计算机模块</span>
+                    <span class="stat-value">85%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">大数据模块</span>
+                    <span class="stat-value">72%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">无人机模块</span>
+                    <span class="stat-value">68%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">机械模块</span>
+                    <span class="stat-value">75%</span>
+                </div>
+                <button class="action-btn" onclick="viewModuleStats()">查看模块统计</button>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <h2>用户开发</h2>
+            
+            <div class="user-creation">
+                <h3>创建新用户</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div class="form-group">
+                        <label for="new-username">用户名</label>
+                        <input type="text" id="new-username" placeholder="请输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password">密码</label>
+                        <input type="password" id="new-password" placeholder="请输入密码">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-role">角色</label>
+                        <select id="new-role">
+                            <option value="student">学生</option>
+                            <option value="teacher">教师</option>
+                            <option value="admin">管理员</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="action-btn" style="margin-top: 20px;" onclick="createUser()">创建用户</button>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <h2>用户管理</h2>
+            
+            <div class="user-management">
+                <h3>用户列表</h3>
+                <div id="user-list">
+                    <!-- 用户列表将显示在这里 -->
+                    <p>点击"加载用户"按钮查看所有用户</p>
+                </div>
+                <button class="action-btn" style="margin-top: 20px;" onclick="loadUsers()">加载用户</button>
+            </div>
+        </div>
+        
+        <div class="admin-features">
+            <h2>管理员权限</h2>
+            <ul class="feature-list">
+                <li class="feature-item">
+                    <span class="feature-icon">👤</span>
+                    <span class="feature-text">用户管理：创建、编辑和删除用户账号</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">🔧</span>
+                    <span class="feature-text">系统设置：配置系统参数和全局选项</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">📊</span>
+                    <span class="feature-text">数据统计：查看系统使用情况和用户行为分析</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">⚙️</span>
+                    <span class="feature-text">模块管理：启用、禁用和配置各学习模块</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">🔒</span>
+                    <span class="feature-text">权限管理：设置用户角色和权限级别</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">🛠️</span>
+                    <span class="feature-text">开发设计：修改系统代码和添加新功能</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="back-link">
+            <a href="index.html">返回首页</a>
+        </div>
+    </div>
+    
+    <script>
+        // 检查登录状态
+        function checkLoginStatus() {
+            const user = localStorage.getItem('user');
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                const userData = JSON.parse(user);
+                if (userData.role !== 'admin') {
+                    window.location.href = 'index.html';
+                }
+            }
+        }
+        
+        // 退出登录
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+        
+        // 查看详细统计
+        function viewDetailedStats() {
+            alert('详细统计功能正在开发中...');
+        }
+        
+        // 查看模块统计
+        function viewModuleStats() {
+            alert('模块统计功能正在开发中...');
+        }
+        
+        // 初始化用户数据
+        function initUsers() {
+            const users = localStorage.getItem('users');
+            if (!users) {
+                // 默认用户数据
+                const defaultUsers = [
+                    { username: 'student', password: '123456', role: 'student' },
+                    { username: 'teacher', password: '123456', role: 'teacher' },
+                    { username: 'admin', password: '123456', role: 'admin' }
+                ];
+                localStorage.setItem('users', JSON.stringify(defaultUsers));
+            }
+        }
+        
+        // 创建用户
+        function createUser() {
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value;
+            const role = document.getElementById('new-role').value;
+            
+            if (!username || !password || !role) {
+                alert('请填写所有必填字段');
+                return;
+            }
+            
+            // 获取现有用户
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            // 检查用户名是否已存在
+            const existingUser = users.find(user => user.username === username);
+            if (existingUser) {
+                alert('用户名已存在');
+                return;
+            }
+            
+            // 添加新用户
+            users.push({ username, password, role });
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            alert('用户创建成功！');
+            
+            // 清空表单
+            document.getElementById('new-username').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('new-role').value = 'student';
+        }
+        
+        // 加载用户列表
+        function loadUsers() {
+            initUsers();
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const userList = document.getElementById('user-list');
+            
+            if (users.length === 0) {
+                userList.innerHTML = '<p>暂无用户</p>';
+                return;
+            }
+            
+            let html = '';
+            users.forEach((user, index) => {
+                const roleText = user.role === 'student' ? '学生' : user.role === 'teacher' ? '教师' : '管理员';
+                html += `
+                    <div class="user-item">
+                        <div class="user-info">
+                            <h4>${user.username}</h4>
+                            <p style="color: #666; font-size: 14px;">角色: ${roleText}</p>
+                        </div>
+                        <div class="user-actions">
+                            <button class="edit-btn" onclick="editUser(${index})">编辑</button>
+                            <button class="delete-btn" onclick="deleteUser(${index})">删除</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            userList.innerHTML = html;
+        }
+        
+        // 编辑用户
+        function editUser(index) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users[index];
+            
+            const newUsername = prompt('请输入新用户名:', user.username);
+            const newPassword = prompt('请输入新密码:', user.password);
+            const newRole = prompt('请输入新角色 (student/teacher/admin):', user.role);
+            
+            if (newUsername && newPassword && newRole) {
+                users[index] = { username: newUsername, password: newPassword, role: newRole };
+                localStorage.setItem('users', JSON.stringify(users));
+                alert('用户信息已更新！');
+                loadUsers();
+            }
+        }
+        
+        // 删除用户
+        function deleteUser(index) {
+            if (confirm('确定要删除该用户吗？')) {
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                users.splice(index, 1);
+                localStorage.setItem('users', JSON.stringify(users));
+                alert('用户已删除！');
+                loadUsers();
+            }
+        }
+        
+        // 页面加载时检查登录状态
+        window.onload = function() {
+            checkLoginStatus();
+            initUsers();
+        };
+    </script>
+</body>
+</html>

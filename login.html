@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 集成式学习平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f0f2 0%, #c9d6df 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .login-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .login-btn:hover {
+            background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>集成式学习平台</h1>
+            <p>请登录以访问系统</p>
+        </div>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="role">角色</label>
+                <select id="role" name="role" required>
+                    <option value="">请选择角色</option>
+                    <option value="student">学生</option>
+                    <option value="teacher">教师</option>
+                    <option value="admin">管理员</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="login-btn">登录</button>
+            
+            <div id="error-message" class="error-message"></div>
+        </form>
+        
+        <div class="back-link">
+            <a href="index.html">返回首页</a>
+        </div>
+    </div>
+    
+    <script>
+        // 初始化用户数据
+        function initUsers() {
+            const users = localStorage.getItem('users');
+            if (!users) {
+                // 默认用户数据
+                const defaultUsers = [
+                    { username: 'student', password: '123456', role: 'student' },
+                    { username: 'teacher', password: '123456', role: 'teacher' },
+                    { username: 'admin', password: '123456', role: 'admin' }
+                ];
+                localStorage.setItem('users', JSON.stringify(defaultUsers));
+            }
+        }
+        
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            const errorMessage = document.getElementById('error-message');
+            
+            // 简单的登录验证（实际项目中应使用后端验证）
+            if (!username || !password || !role) {
+                errorMessage.textContent = '请填写所有必填字段';
+                return;
+            }
+            
+            // 初始化用户数据
+            initUsers();
+            
+            // 从本地存储获取用户数据
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            const user = users.find(u => u.username === username && u.password === password && u.role === role);
+            
+            if (user) {
+                // 存储用户信息到本地存储
+                localStorage.setItem('user', JSON.stringify(user));
+                // 根据角色跳转到相应的页面
+                if (user.role === 'teacher') {
+                    window.location.href = 'teacher-panel.html';
+                } else if (user.role === 'admin') {
+                    window.location.href = 'admin-panel.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                errorMessage.textContent = '用户名、密码或角色错误';
+            }
+        });
+    </script>
+</body>
+</html>

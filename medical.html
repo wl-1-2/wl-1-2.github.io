@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医护专业 - 人体器官组装</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #3a506b, #1c2541);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin-top: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #3a506b;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .game-title {
+            color: #3a506b;
+        }
+        
+        .game-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .control-btn.primary {
+            background: linear-gradient(145deg, #27ae60, #229954);
+        }
+        
+        .game-workspace {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .body-container {
+            flex: 3;
+            min-width: 600px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            position: relative;
+            min-height: 600px;
+        }
+        
+        .body-cavity {
+            position: relative;
+            width: 100%;
+            height: 700px;
+            background: #f0f8ff;
+            border-radius: 8px;
+            border: 2px solid #3a506b;
+            overflow: hidden;
+            background-image: url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20body%20anatomy%20internal%20organs%20diagram%20medical%20illustration%20with%20organ%20positions%20labeled&image_size=landscape_16_9');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .organ-image {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .organ-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .organ-image.dragging {
+            opacity: 0.8;
+            cursor: grabbing;
+            transform: scale(1.1);
+            z-index: 100;
+        }
+        
+        .organ-details {
+            position: absolute;
+            background: white;
+            border: 1px solid #3a506b;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            max-width: 300px;
+            font-size: 14px;
+        }
+        
+        .organ-details h4 {
+            margin-top: 0;
+            color: #3a506b;
+            font-size: 16px;
+        }
+        
+        .organ-details h5 {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            color: #3a506b;
+            font-size: 14px;
+        }
+        
+        .organ-details p {
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+        
+        .organ-details ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .organ-details li {
+            margin: 3px 0;
+            line-height: 1.3;
+        }
+        
+        .organ-details h4 {
+            margin-top: 0;
+            color: #3a506b;
+        }
+        
+        .organ-details p {
+            font-size: 12px;
+            color: #666;
+            margin: 5px 0;
+        }
+        
+        .organs-container {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .system-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        
+        .system-tab {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .system-tab.active {
+            background: #3a506b;
+            color: white;
+            border-color: #3a506b;
+        }
+        
+        .organs-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .organs-header h3 {
+            color: #3a506b;
+        }
+        
+        .organs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .organ-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s;
+        }
+        
+        .organ-item:hover {
+            border-color: #3a506b;
+            transform: translateY(-3px);
+        }
+        
+        .organ-item.dragging {
+            opacity: 0.8;
+            cursor: grabbing;
+            transform: scale(1.1);
+            z-index: 100;
+        }
+        
+        .organ-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .organ-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #3a506b;
+        }
+        
+        .organ-description {
+            font-size: 10px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .game-info {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            margin-top: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #3a506b;
+        }
+        
+        .info-value {
+            color: #666;
+        }
+        
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid #3a506b;
+        }
+        
+        .modal-title {
+            color: #3a506b;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .modal-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .correct-stat .stat-value {
+            color: #27ae60;
+        }
+        
+        .wrong-stat .stat-value {
+            color: #e74c3c;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 1000px) {
+            .game-workspace {
+                flex-direction: column;
+            }
+            
+            .body-container,
+            .organs-container {
+                min-width: 100%;
+            }
+            
+            .back-button {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .game-controls {
+                justify-content: center;
+            }
+            
+            .body-cavity {
+                height: 400px;
+            }
+            
+            .organs-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">← 返回首页</button>
+    
+    <div class="container">
+        <header>
+            <h1>医护专业 - 人体器官组装</h1>
+            <p class="subtitle">学习人体器官的结构和位置，按系统分类组装</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">人体器官组装</h2>
+                <div class="game-controls">
+                    <button class="control-btn" onclick="resetGame()">重置</button>
+                    <button class="control-btn primary" onclick="checkAssembly()">检查组装</button>
+                </div>
+            </div>
+            
+            <div class="game-workspace">
+                <!-- 身体腔室 -->
+                <div class="body-container">
+                    <div class="body-cavity" id="body-cavity">
+                        <!-- 器官图片将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 器官容器 -->
+                <div class="organs-container">
+                    <div class="system-tabs" id="system-tabs">
+                        <div class="system-tab active" data-system="circulatory">循环系统</div>
+                        <div class="system-tab" data-system="urinary">泌尿系统</div>
+                        <div class="system-tab" data-system="digestive">消化系统</div>
+                        <div class="system-tab" data-system="respiratory">呼吸系统</div>
+                        <div class="system-tab" data-system="reproductive">生殖系统</div>
+                        <div class="system-tab" data-system="nervous">神经系统</div>
+                    </div>
+                    
+                    <div class="organs-header">
+                        <h3>器官库</h3>
+                        <p style="font-size: 12px; color: #666;">点击选择器官，然后在身体模型中点击放置</p>
+                    </div>
+                    
+                    <div class="organs-grid" id="organs-grid">
+                        <!-- 器官将通过JavaScript动态生成 -->
+                    </div>
+                    
+                    <div class="game-info">
+                        <div class="info-item">
+                            <span class="info-label">已放置器官:</span>
+                            <span class="info-value" id="organ-count">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">正确位置:</span>
+                            <span class="info-value" id="correct-position">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">错误位置:</span>
+                            <span class="info-value" id="wrong-position">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果模态框 -->
+    <div class="result-modal" id="result-modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modal-title">组装结果</h2>
+            <div class="modal-stats">
+                <div class="stat-item correct-stat">
+                    <span class="stat-value" id="correct-count">0</span>
+                    <span class="stat-label">正确</span>
+                </div>
+                <div class="stat-item wrong-stat">
+                    <span class="stat-value" id="wrong-count">0</span>
+                    <span class="stat-label">错误</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="total-count">0</span>
+                    <span class="stat-label">总数</span>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeModal()">关闭</button>
+                <button class="control-btn" onclick="showCorrectLayout()">查看正确布局</button>
+                <button class="control-btn primary" onclick="resetGame()">重新组装</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // 人体器官数据 - 使用真实的器官图片
+    const organSystems = {
+        circulatory: {
+            name: '循环系统',
+            organs: [
+                {
+                    id: 'heart',
+                    name: '心脏',
+                    icon: '❤️',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20heart%20anatomy%20realistic%20medical%20photograph%20with%20chambers%20and%20valves%20clearly%20visible&image_size=square',
+                    size: { width: 150, height: 120 },
+                    correctPosition: { x: 250, y: 180, width: 150, height: 120 },
+                    description: '心脏是循环系统的核心，由四个心腔组成：左心房、左心室、右心房、右心室。',
+                    parts: [
+                        { id: 'heart-left-atrium', name: '左心房', description: '接收来自肺静脉的含氧血液' },
+                        { id: 'heart-left-ventricle', name: '左心室', description: '将含氧血液泵入主动脉' },
+                        { id: 'heart-right-atrium', name: '右心房', description: '接收来自上下腔静脉的缺氧血液' },
+                        { id: 'heart-right-ventricle', name: '右心室', description: '将缺氧血液泵入肺动脉' },
+                        { id: 'heart-mitral-valve', name: '二尖瓣', description: '位于左心房与左心室之间' },
+                        { id: 'heart-tricuspid-valve', name: '三尖瓣', description: '位于右心房与右心室之间' },
+                        { id: 'heart-aortic-valve', name: '主动脉瓣', description: '位于左心室与主动脉之间' },
+                        { id: 'heart-pulmonary-valve', name: '肺动脉瓣', description: '位于右心室与肺动脉之间' }
+                    ]
+                },
+                {
+                    id: 'aorta',
+                    name: '主动脉',
+                    icon: '🩸',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20aorta%20anatomy%20realistic%20medical%20photograph%20with%20ascending%20arch%20and%20descending%20parts&image_size=landscape_4_3',
+                    size: { width: 180, height: 100 },
+                    correctPosition: { x: 300, y: 150, width: 180, height: 100 },
+                    description: '主动脉是人体最大的动脉，从左心室发出，分为升主动脉、主动脉弓和降主动脉。',
+                    parts: [
+                        { id: 'aorta-ascending', name: '升主动脉', description: '从心脏发出的起始部分' },
+                        { id: 'aorta-arch', name: '主动脉弓', description: '弧形弯曲部分，发出头臂干、左颈总动脉和左锁骨下动脉' },
+                        { id: 'aorta-descending', name: '降主动脉', description: '分为胸降主动脉和腹降主动脉' }
+                    ]
+                }
+            ]
+        },
+        urinary: {
+            name: '泌尿系统',
+            organs: [
+                {
+                    id: 'kidney',
+                    name: '肾脏',
+                    icon: '🫁',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20kidney%20anatomy%20realistic%20medical%20photograph%20with%20cortex%20medulla%20and%20pelvis%20clearly%20visible&image_size=square',
+                    size: { width: 120, height: 150 },
+                    correctPosition: { x: 180, y: 220, width: 120, height: 150 },
+                    description: '肾脏是泌尿系统的主要器官，负责过滤血液、产生尿液。',
+                    parts: [
+                        { id: 'kidney-cortex', name: '肾皮质', description: '外层，包含肾小体和肾小管起始段' },
+                        { id: 'kidney-medulla', name: '肾髓质', description: '内层，包含肾锥体和肾乳头' },
+                        { id: 'kidney-pelvis', name: '肾盂', description: '收集尿液，连接输尿管' }
+                    ]
+                },
+                {
+                    id: 'bladder',
+                    name: '膀胱',
+                    icon: '🫘',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20bladder%20anatomy%20realistic%20medical%20photograph%20with%20trigone%20and%20urethra%20opening&image_size=square',
+                    size: { width: 150, height: 100 },
+                    correctPosition: { x: 250, y: 380, width: 150, height: 100 },
+                    description: '膀胱是储存尿液的器官，位于盆腔内。',
+                    parts: [
+                        { id: 'bladder-wall', name: '膀胱壁', description: '由黏膜层、肌层和浆膜层组成' },
+                        { id: 'bladder-trigone', name: '膀胱三角', description: '膀胱底部的三角形区域，连接输尿管和尿道' }
+                    ]
+                }
+            ]
+        },
+        digestive: {
+            name: '消化系统',
+            organs: [
+                {
+                    id: 'liver',
+                    name: '肝脏',
+                    icon: '🫀',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20liver%20anatomy%20realistic%20medical%20photograph%20with%20right%20left%20lobes%20and%20gallbladder%20clearly%20visible&image_size=square',
+                    size: { width: 180, height: 140 },
+                    correctPosition: { x: 350, y: 180, width: 180, height: 140 },
+                    description: '肝脏是人体最大的消化腺，负责代谢、解毒和胆汁分泌。',
+                    parts: [
+                        { id: 'liver-right-lobe', name: '肝右叶', description: '肝脏最大的部分' },
+                        { id: 'liver-left-lobe', name: '肝左叶', description: '位于肝脏左侧' },
+                        { id: 'liver-gallbladder', name: '胆囊', description: '储存胆汁的器官' }
+                    ]
+                },
+                {
+                    id: 'stomach',
+                    name: '胃',
+                    icon: '🫀',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20stomach%20anatomy%20realistic%20medical%20photograph%20with%20fundus%20body%20and%20antrum%20clearly%20visible&image_size=square',
+                    size: { width: 150, height: 120 },
+                    correctPosition: { x: 250, y: 280, width: 150, height: 120 },
+                    description: '胃是消化系统的重要器官，负责食物的初步消化。',
+                    parts: [
+                        { id: 'stomach-fundus', name: '胃底', description: '胃的上部，靠近食管' },
+                        { id: 'stomach-body', name: '胃体', description: '胃的中间部分' },
+                        { id: 'stomach-antrum', name: '胃窦', description: '胃的下部，靠近十二指肠' }
+                    ]
+                },
+                {
+                    id: 'intestines',
+                    name: '肠',
+                    icon: '🔄',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20intestines%20anatomy%20realistic%20medical%20photograph%20with%20small%20and%20large%20intestine%20clearly%20visible&image_size=landscape_4_3',
+                    size: { width: 200, height: 140 },
+                    correctPosition: { x: 200, y: 320, width: 200, height: 140 },
+                    description: '肠分为小肠和大肠，负责营养吸收和废物排泄。',
+                    parts: [
+                        { id: 'intestines-duodenum', name: '十二指肠', description: '小肠的起始部分，连接胃' },
+                        { id: 'intestines-jejunum', name: '空肠', description: '小肠的中间部分，吸收营养' },
+                        { id: 'intestines-ileum', name: '回肠', description: '小肠的末端，连接大肠' },
+                        { id: 'intestines-colon', name: '结肠', description: '大肠的主要部分，吸收水分' }
+                    ]
+                },
+                {
+                    id: 'pancreas',
+                    name: '胰腺',
+                    icon: '🧪',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20pancreas%20anatomy%20realistic%20medical%20photograph%20with%20head%20body%20and%20tail%20clearly%20visible&image_size=square',
+                    size: { width: 150, height: 80 },
+                    correctPosition: { x: 300, y: 280, width: 150, height: 80 },
+                    description: '胰腺兼具消化和内分泌功能，分泌胰液和胰岛素。',
+                    parts: [
+                        { id: 'pancreas-head', name: '胰头', description: '胰腺的右端，靠近十二指肠' },
+                        { id: 'pancreas-body', name: '胰体', description: '胰腺的中间部分' },
+                        { id: 'pancreas-tail', name: '胰尾', description: '胰腺的左端，靠近脾脏' }
+                    ]
+                }
+            ]
+        },
+        respiratory: {
+            name: '呼吸系统',
+            organs: [
+                {
+                    id: 'lungs',
+                    name: '肺',
+                    icon: '🫁',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20lungs%20anatomy%20realistic%20medical%20photograph%20with%20lobes%20and%20bronchi%20clearly%20visible&image_size=landscape_4_3',
+                    size: { width: 220, height: 160 },
+                    correctPosition: { x: 200, y: 120, width: 220, height: 160 },
+                    description: '肺是呼吸系统的主要器官，负责气体交换。',
+                    parts: [
+                        { id: 'lungs-left-upper', name: '左肺上叶', description: '左肺的上部' },
+                        { id: 'lungs-left-lower', name: '左肺下叶', description: '左肺的下部' },
+                        { id: 'lungs-right-upper', name: '右肺上叶', description: '右肺的上部' },
+                        { id: 'lungs-right-middle', name: '右肺中叶', description: '右肺的中部' },
+                        { id: 'lungs-right-lower', name: '右肺下叶', description: '右肺的下部' }
+                    ]
+                },
+                {
+                    id: 'trachea',
+                    name: '气管',
+                    icon: '🌀',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20trachea%20anatomy%20realistic%20medical%20photograph%20with%20cartilage%20rings%20and%20bronchi%20division%20clearly%20visible&image_size=landscape_4_3',
+                    size: { width: 180, height: 80 },
+                    correctPosition: { x: 250, y: 80, width: 180, height: 80 },
+                    description: '气管是连接喉和主支气管的管道，负责空气的输送。',
+                    parts: [
+                        { id: 'trachea-main', name: '气管', description: '主要的气管部分，由C形软骨支撑' },
+                        { id: 'trachea-bronchi', name: '主支气管', description: '气管分叉后形成的左右主支气管' }
+                    ]
+                }
+            ]
+        },
+        reproductive: {
+            name: '生殖系统',
+            organs: [
+                {
+                    id: 'male-reproductive',
+                    name: '男性生殖系统',
+                    icon: '♂️',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=male%20reproductive%20system%20anatomy%20realistic%20medical%20photograph%20with%20testes%20epididymis%20and%20prostate%20clearly%20visible&image_size=square',
+                    size: { width: 180, height: 140 },
+                    correctPosition: { x: 250, y: 420, width: 180, height: 140 },
+                    description: '男性生殖系统负责产生精子和雄性激素。',
+                    parts: [
+                        { id: 'testes', name: '睾丸', description: '产生精子和睾酮' },
+                        { id: 'epididymis', name: '附睾', description: '储存和成熟精子' },
+                        { id: 'vas-deferens', name: '输精管', description: '输送精子' },
+                        { id: 'prostate', name: '前列腺', description: '分泌前列腺液' }
+                    ]
+                },
+                {
+                    id: 'female-reproductive',
+                    name: '女性生殖系统',
+                    icon: '♀️',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=female%20reproductive%20system%20anatomy%20realistic%20medical%20photograph%20with%20ovaries%20uterus%20and%20fallopian%20tubes%20clearly%20visible&image_size=square',
+                    size: { width: 180, height: 140 },
+                    correctPosition: { x: 250, y: 420, width: 180, height: 140 },
+                    description: '女性生殖系统负责产生卵子和雌性激素，孕育胎儿。',
+                    parts: [
+                        { id: 'ovaries', name: '卵巢', description: '产生卵子和雌激素' },
+                        { id: 'fallopian-tubes', name: '输卵管', description: '输送卵子，受精场所' },
+                        { id: 'uterus', name: '子宫', description: '孕育胎儿的器官' },
+                        { id: 'vagina', name: '阴道', description: '性交器官，胎儿娩出通道' }
+                    ]
+                }
+            ]
+        },
+        nervous: {
+            name: '神经系统',
+            organs: [
+                {
+                    id: 'brain',
+                    name: '大脑',
+                    icon: '🧠',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20brain%20anatomy%20realistic%20medical%20photograph%20with%20lobes%20and%20cerebellum%20clearly%20visible&image_size=square',
+                    size: { width: 200, height: 160 },
+                    correctPosition: { x: 250, y: 20, width: 200, height: 160 },
+                    description: '大脑是神经系统的核心，负责控制和协调人体的各种活动。',
+                    parts: [
+                        { id: 'brain-frontal', name: '额叶', description: '负责决策、计划和情绪' },
+                        { id: 'brain-parietal', name: '顶叶', description: '负责感觉和空间认知' },
+                        { id: 'brain-temporal', name: '颞叶', description: '负责听觉和记忆' },
+                        { id: 'brain-occipital', name: '枕叶', description: '负责视觉' },
+                        { id: 'brain-cerebellum', name: '小脑', description: '负责平衡和协调' },
+                        { id: 'brain-brainstem', name: '脑干', description: '负责基本生命功能' }
+                    ]
+                },
+                {
+                    id: 'spinal-cord',
+                    name: '脊髓',
+                    icon: '📏',
+                    image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=human%20spinal%20cord%20anatomy%20realistic%20medical%20photograph%20with%20cervical%20thoracic%20and%20lumbar%20segments%20clearly%20visible&image_size=landscape_4_3',
+                    size: { width: 220, height: 80 },
+                    correctPosition: { x: 250, y: 180, width: 220, height: 80 },
+                    description: '脊髓是连接大脑和身体的神经通路，负责传递神经信号。',
+                    parts: [
+                        { id: 'spinal-cord-cervical', name: '颈段脊髓', description: '颈部的脊髓部分' },
+                        { id: 'spinal-cord-thoracic', name: '胸段脊髓', description: '胸部的脊髓部分' },
+                        { id: 'spinal-cord-lumbar', name: '腰段脊髓', description: '腰部的脊髓部分' }
+                    ]
+                }
+            ]
+        }
+    };
+    
+    // 游戏状态
+    let gameState = {
+        currentSystem: 'circulatory',
+        placedOrgans: [],
+        selectedOrgan: null,
+        isDragging: false,
+        draggedElement: null,
+        offsetX: 0,
+        offsetY: 0,
+        correctCount: 0,
+        wrongCount: 0
+    };
+    
+    // DOM元素
+    const bodyCavity = document.getElementById('body-cavity');
+    const organsGrid = document.getElementById('organs-grid');
+    const systemTabs = document.getElementById('system-tabs');
+    const organCountElement = document.getElementById('organ-count');
+    const correctPositionElement = document.getElementById('correct-position');
+    const wrongPositionElement = document.getElementById('wrong-position');
+    const resultModal = document.getElementById('result-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const correctCountElement = document.getElementById('correct-count');
+    const wrongCountElement = document.getElementById('wrong-count');
+    const totalCountElement = document.getElementById('total-count');
+    
+    // 初始化
+    function init() {
+        // 初始化系统标签
+        initSystemTabs();
+        
+        // 初始化拖拽事件
+        initDragEvents();
+        
+        // 加载器官
+        loadOrgans('circulatory');
+        
+        // 初始化游戏
+        resetGame();
+    }
+    
+    // 初始化系统标签
+    function initSystemTabs() {
+        systemTabs.addEventListener('click', function(e) {
+            const tab = e.target.closest('.system-tab');
+            if (tab) {
+                // 移除所有激活状态
+                document.querySelectorAll('.system-tab').forEach(t => t.classList.remove('active'));
+                // 添加激活状态
+                tab.classList.add('active');
+                // 加载对应系统的器官
+                const system = tab.dataset.system;
+                gameState.currentSystem = system;
+                loadOrgans(system);
+            }
+        });
+    }
+    
+    // 初始化拖拽事件
+    function initDragEvents() {
+        // 身体腔室点击事件
+        bodyCavity.addEventListener('click', function(e) {
+            if (gameState.selectedOrgan) {
+                placeOrgan(e);
+            }
+        });
+        
+        // 全局鼠标事件
+        document.addEventListener('mousemove', function(e) {
+            if (gameState.isDragging && gameState.draggedElement) {
+                const rect = bodyCavity.getBoundingClientRect();
+                const x = e.clientX - rect.left - gameState.offsetX;
+                const y = e.clientY - rect.top - gameState.offsetY;
+                
+                // 限制在身体腔室内
+                const maxX = rect.width - gameState.draggedElement.offsetWidth;
+                const maxY = rect.height - gameState.draggedElement.offsetHeight;
+                
+                const newX = Math.max(0, Math.min(x, maxX));
+                const newY = Math.max(0, Math.min(y, maxY));
+                
+                gameState.draggedElement.style.left = newX + 'px';
+                gameState.draggedElement.style.top = newY + 'px';
+                
+                // 实时更新位置检查
+                const organId = gameState.draggedElement.dataset.organId;
+                const organ = gameState.placedOrgans.find(item => item.organ.id === organId).organ;
+                const isCorrect = checkOrganPosition(organ, newX, newY);
+                
+                // 更新边框颜色
+                gameState.draggedElement.style.border = '2px solid ' + (isCorrect ? '#27ae60' : '#e74c3c');
+                
+                // 更新放置的器官信息
+                const placedOrgan = gameState.placedOrgans.find(item => item.organ.id === organId);
+                if (placedOrgan) {
+                    placedOrgan.position = { x: newX, y: newY };
+                    placedOrgan.isCorrect = isCorrect;
+                }
+                
+                // 更新游戏信息
+                updateGameInfo();
+            }
+        });
+        
+        document.addEventListener('mouseup', function(e) {
+            if (gameState.isDragging) {
+                gameState.isDragging = false;
+                if (gameState.draggedElement) {
+                    gameState.draggedElement.classList.remove('dragging');
+                    gameState.draggedElement = null;
+                }
+            }
+        });
+    }
+    
+    // 放置器官
+    function placeOrgan(e) {
+        const rect = bodyCavity.getBoundingClientRect();
+        const x = e.clientX - rect.left - gameState.selectedOrgan.size.width / 2;
+        const y = e.clientY - rect.top - gameState.selectedOrgan.size.height / 2;
+        
+        // 创建器官图片
+        const organImage = document.createElement('div');
+        organImage.className = 'organ-image';
+        organImage.dataset.organId = gameState.selectedOrgan.id;
+        organImage.style.left = Math.max(0, Math.min(x, rect.width - gameState.selectedOrgan.size.width)) + 'px';
+        organImage.style.top = Math.max(0, Math.min(y, rect.height - gameState.selectedOrgan.size.height)) + 'px';
+        organImage.style.width = gameState.selectedOrgan.size.width + 'px';
+        organImage.style.height = gameState.selectedOrgan.size.height + 'px';
+        
+        // 检查位置是否正确
+        const isPositionCorrect = checkOrganPosition(gameState.selectedOrgan, parseInt(organImage.style.left), parseInt(organImage.style.top));
+        
+        // 根据位置正确性设置边框颜色
+        organImage.style.border = '2px solid ' + (isPositionCorrect ? '#27ae60' : '#e74c3c');
+        
+        organImage.innerHTML = `
+            <img src="${gameState.selectedOrgan.image}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;">
+        `;
+        
+        // 添加拖拽功能
+        organImage.addEventListener('mousedown', function(e) {
+            gameState.isDragging = true;
+            gameState.draggedElement = organImage;
+            const rect = organImage.getBoundingClientRect();
+            gameState.offsetX = e.clientX - rect.left;
+            gameState.offsetY = e.clientY - rect.top;
+            organImage.classList.add('dragging');
+        });
+        
+        // 添加点击查看详情功能
+        organImage.addEventListener('click', function(e) {
+            if (!gameState.isDragging) {
+                showOrganDetails(gameState.selectedOrgan, e.clientX, e.clientY);
+            }
+        });
+        
+        // 添加到身体腔室
+        bodyCavity.appendChild(organImage);
+        
+        // 记录放置的器官
+        gameState.placedOrgans.push({
+            organ: gameState.selectedOrgan,
+            element: organImage,
+            position: { x: parseInt(organImage.style.left), y: parseInt(organImage.style.top) },
+            isCorrect: isPositionCorrect
+        });
+        
+        // 更新游戏信息
+        updateGameInfo();
+    }
+    
+    // 检查器官位置是否正确
+    function checkOrganPosition(organ, x, y) {
+        if (!organ.correctPosition) return false;
+        
+        const correctX = organ.correctPosition.x;
+        const correctY = organ.correctPosition.y;
+        const correctWidth = organ.correctPosition.width;
+        const correctHeight = organ.correctPosition.height;
+        
+        // 检查器官是否在正确的位置范围内
+        return x >= correctX && x <= correctX + correctWidth - organ.size.width &&
+               y >= correctY && y <= correctY + correctHeight - organ.size.height;
+    }
+    
+    // 显示器官详情
+    function showOrganDetails(organ, x, y) {
+        // 移除现有详情
+        const existingDetails = document.querySelector('.organ-details');
+        if (existingDetails) {
+            existingDetails.remove();
+        }
+        
+        // 创建详情元素
+        const details = document.createElement('div');
+        details.className = 'organ-details';
+        details.style.left = x + 'px';
+        details.style.top = y + 'px';
+        
+        // 构建详情内容
+        let partsHtml = '';
+        if (organ.parts) {
+            partsHtml = '<h5>内部结构：</h5><ul>';
+            organ.parts.forEach(part => {
+                partsHtml += `<li>${part.name}：${part.description}</li>`;
+            });
+            partsHtml += '</ul>';
+        }
+        
+        details.innerHTML = `
+            <h4>${organ.name}</h4>
+            <p>${organ.description}</p>
+            ${partsHtml}
+            <button onclick="this.parentElement.remove()" style="margin-top: 10px; padding: 5px 10px; background: #3a506b; color: white; border: none; border-radius: 4px; cursor: pointer;">关闭</button>
+        `;
+        
+        // 添加到页面
+        document.body.appendChild(details);
+        
+        // 显示详情
+        details.style.display = 'block';
+        
+        // 点击其他地方关闭
+        setTimeout(() => {
+            document.addEventListener('click', function closeDetails(e) {
+                if (!details.contains(e.target)) {
+                    details.remove();
+                    document.removeEventListener('click', closeDetails);
+                }
+            });
+        }, 100);
+    }
+    
+    // 加载器官
+    function loadOrgans(system) {
+        organsGrid.innerHTML = '';
+        const systemData = organSystems[system];
+        
+        if (systemData && systemData.organs) {
+            systemData.organs.forEach(organ => {
+                const organElement = document.createElement('div');
+                organElement.className = 'organ-item';
+                organElement.dataset.organId = organ.id;
+                organElement.innerHTML = `
+                    <div class="organ-icon">${organ.icon}</div>
+                    <div class="organ-name">${organ.name}</div>
+                    <div class="organ-description">${organ.description.substring(0, 30)}...</div>
+                `;
+                
+                // 添加点击事件
+                organElement.addEventListener('click', function() {
+                    selectOrgan(organ);
+                });
+                
+                organsGrid.appendChild(organElement);
+            });
+        }
+    }
+    
+    // 选择器官
+    function selectOrgan(organ) {
+        gameState.selectedOrgan = organ;
+        console.log(`已选择器官: ${organ.name}`);
+        
+        // 高亮选中的器官
+        document.querySelectorAll('.organ-item').forEach(item => {
+            item.style.borderColor = '#e9ecef';
+        });
+        const selectedElement = document.querySelector(`[data-organ-id="${organ.id}"]`);
+        if (selectedElement) {
+            selectedElement.style.borderColor = '#3a506b';
+            selectedElement.style.borderWidth = '2px';
+        }
+    }
+    
+    // 检查组装
+    function checkAssembly() {
+        // 使用游戏状态中的正确和错误计数
+        const correct = gameState.correctCount;
+        const wrong = gameState.wrongCount;
+        const total = gameState.placedOrgans.length;
+        
+        // 更新模态框
+        correctCountElement.textContent = correct;
+        wrongCountElement.textContent = wrong;
+        totalCountElement.textContent = total;
+        
+        if (correct === total && total > 0) {
+            modalTitle.textContent = '组装成功！';
+        } else {
+            modalTitle.textContent = '组装结果';
+        }
+        
+        // 显示模态框
+        resultModal.style.display = 'flex';
+    }
+    
+    // 显示正确的器官布局
+    function showCorrectLayout() {
+        // 清空身体腔室
+        document.querySelectorAll('.organ-image').forEach(organ => {
+            organ.remove();
+        });
+        
+        // 重置游戏状态
+        gameState.placedOrgans = [];
+        gameState.correctCount = 0;
+        gameState.wrongCount = 0;
+        
+        // 遍历所有系统的器官
+        Object.values(organSystems).forEach(system => {
+            system.organs.forEach(organ => {
+                if (organ.correctPosition) {
+                    // 创建器官图片
+                    const organImage = document.createElement('div');
+                    organImage.className = 'organ-image';
+                    organImage.dataset.organId = organ.id;
+                    organImage.style.left = organ.correctPosition.x + 'px';
+                    organImage.style.top = organ.correctPosition.y + 'px';
+                    organImage.style.width = organ.size.width + 'px';
+                    organImage.style.height = organ.size.height + 'px';
+                    organImage.style.border = '2px solid #27ae60';
+                    
+                    organImage.innerHTML = `
+                        <img src="${organ.image}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;">
+                    `;
+                    
+                    // 添加点击查看详情功能
+                    organImage.addEventListener('click', function(e) {
+                        showOrganDetails(organ, e.clientX, e.clientY);
+                    });
+                    
+                    // 添加到身体腔室
+                    bodyCavity.appendChild(organImage);
+                    
+                    // 记录放置的器官
+                    gameState.placedOrgans.push({
+                        organ: organ,
+                        element: organImage,
+                        position: { x: organ.correctPosition.x, y: organ.correctPosition.y },
+                        isCorrect: true
+                    });
+                }
+            });
+        });
+        
+        // 更新游戏信息
+        updateGameInfo();
+        
+        // 关闭模态框
+        closeModal();
+    }
+    
+    // 重置游戏
+    function resetGame() {
+        // 清空放置的器官
+        gameState.placedOrgans = [];
+        gameState.selectedOrgan = null;
+        gameState.correctCount = 0;
+        gameState.wrongCount = 0;
+        
+        // 清空身体腔室中的器官
+        document.querySelectorAll('.organ-image').forEach(organ => {
+            organ.remove();
+        });
+        
+        // 移除器官详情
+        const existingDetails = document.querySelector('.organ-details');
+        if (existingDetails) {
+            existingDetails.remove();
+        }
+        
+        // 重置器官状态
+        document.querySelectorAll('.organ-item').forEach(item => {
+            item.style.borderColor = '#e9ecef';
+            item.style.borderWidth = '2px';
+        });
+        
+        // 更新游戏信息
+        updateGameInfo();
+        closeModal();
+    }
+    
+    // 更新游戏信息
+    function updateGameInfo() {
+        const organCount = gameState.placedOrgans.length;
+        
+        // 计算正确和错误的位置数量
+        const correctCount = gameState.placedOrgans.filter(item => item.isCorrect).length;
+        const wrongCount = organCount - correctCount;
+        
+        // 更新游戏状态
+        gameState.correctCount = correctCount;
+        gameState.wrongCount = wrongCount;
+        
+        // 更新UI
+        organCountElement.textContent = organCount;
+        correctPositionElement.textContent = correctCount;
+        wrongPositionElement.textContent = wrongCount;
+    }
+    
+    // 关闭模态框
+    function closeModal() {
+        resultModal.style.display = 'none';
+    }
+    
+    // 初始化应用
+    init();
+    </script>
+</body>
+</html>
