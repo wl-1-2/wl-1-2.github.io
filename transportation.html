@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>城市规划设计 - 城市轨道规划设计</title>
+    <!-- Leaflet.js 地图库 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #3a506b, #1c2541);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin-top: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #3a506b;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .game-title {
+            color: #3a506b;
+        }
+        
+        .game-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            background: linear-gradient(145deg, #3a506b, #1c2541);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .control-btn.primary {
+            background: linear-gradient(145deg, #27ae60, #229954);
+        }
+        
+        .game-workspace {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .map-container {
+            flex: 3;
+            min-width: 600px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            position: relative;
+            min-height: 500px;
+        }
+        
+        .city-map {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            border-radius: 8px;
+            border: 2px solid #3a506b;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .custom-marker {
+            z-index: 1000 !important;
+        }
+        
+        .station {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #3498db;
+            border: 2px solid #2980b9;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            z-index: 1000 !important;
+        }
+        
+        .track {
+            position: absolute;
+            height: 4px;
+            background: #3a506b;
+            transform-origin: 0 0;
+            z-index: 500 !important;
+        }
+        
+        .city-block {
+            position: absolute;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #3a506b;
+        }
+        
+        .landmark {
+            position: absolute;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .landmark:hover {
+            z-index: 200 !important;
+        }
+        
+        .station {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #3498db;
+            border: 2px solid #2980b9;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .station:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+        
+        .station.selected {
+            background: #e74c3c;
+            border-color: #c0392b;
+        }
+        
+        .track {
+            position: absolute;
+            height: 4px;
+            background: #3a506b;
+            transform-origin: 0 0;
+            z-index: 10;
+        }
+        
+        .track.active {
+            background: #27ae60;
+            box-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+        }
+        
+        .toolbox {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .toolbox-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .toolbox-header h3 {
+            color: #3a506b;
+        }
+        
+        .tools {
+            margin-bottom: 30px;
+        }
+        
+        .tool-group {
+            margin-bottom: 20px;
+        }
+        
+        .tool-group h4 {
+            color: #3a506b;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .tool-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .tool-button {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .tool-button:hover {
+            border-color: #3a506b;
+            transform: translateY(-2px);
+        }
+        
+        .tool-button.active {
+            background: #3a506b;
+            color: white;
+            border-color: #3a506b;
+        }
+        
+        .game-info {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #3a506b;
+        }
+        
+        .info-value {
+            color: #666;
+        }
+        
+        .game-objectives {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .objectives-title {
+            font-weight: 600;
+            color: #3a506b;
+            margin-bottom: 10px;
+        }
+        
+        .objective-item {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .objective-item::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #3a506b;
+            font-weight: bold;
+        }
+        
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid #3a506b;
+        }
+        
+        .modal-title {
+            color: #3a506b;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .modal-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .correct-stat .stat-value {
+            color: #27ae60;
+        }
+        
+        .wrong-stat .stat-value {
+            color: #e74c3c;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 1000px) {
+            .game-workspace {
+                flex-direction: column;
+            }
+            
+            .map-container,
+            .toolbox {
+                min-width: 100%;
+            }
+            
+            .back-button {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .game-controls {
+                justify-content: center;
+            }
+            
+            .city-map {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">← 返回首页</button>
+    
+    <div class="container">
+        <header>
+            <h1>城市规划设计 - 城市轨道规划设计</h1>
+            <p class="subtitle">结合真实城市地理环境，设计合理的城市轨道交通网络</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">城市轨道规划设计</h2>
+                <div class="game-controls">
+                    <select id="city-select" onchange="changeCity(this.value)" style="padding: 10px; border-radius: 6px; border: 2px solid #3a506b; font-size: 14px; margin-right: 10px;">
+                        <option value="beijing">北京</option>
+                        <option value="shanghai">上海</option>
+                        <option value="guangzhou">广州</option>
+                        <option value="chengdu">成都</option>
+                        <option value="lanzhou">兰州</option>
+                        <option value="taiyuan">太原</option>
+                        <option value="shenzhen">深圳</option>
+                        <option value="hangzhou">杭州</option>
+                    </select>
+                    <button class="control-btn" onclick="resetGame()">重置</button>
+                    <button class="control-btn primary" onclick="checkDesign()">检查设计</button>
+                </div>
+            </div>
+            
+            <div class="game-workspace">
+                <!-- 地图区域 -->
+                <div class="map-container">
+                    <div class="city-map" id="city-map">
+                        <!-- 城市区块和站点将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 工具箱 -->
+                <div class="toolbox">
+                    <div class="toolbox-header">
+                        <h3>工具箱</h3>
+                    </div>
+                    
+                    <div class="tools">
+                        <div class="tool-group">
+                            <h4>工具</h4>
+                            <div class="tool-buttons">
+                                <button class="tool-button active" data-tool="station">添加站点</button>
+                                <button class="tool-button" data-tool="track">绘制轨道</button>
+                                <button class="tool-button" data-tool="erase">删除</button>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-group">
+                            <h4>轨道类型</h4>
+                            <div class="tool-buttons">
+                                <button class="tool-button active" data-track="metro">地铁</button>
+                                <button class="tool-button" data-track="light-rail">轻轨</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-info">
+                        <div class="info-item">
+                            <span class="info-label">站点数量:</span>
+                            <span class="info-value" id="station-count">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">轨道长度:</span>
+                            <span class="info-value" id="track-length">0m</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">覆盖区域:</span>
+                            <span class="info-value" id="coverage">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="game-objectives">
+                        <div class="objectives-title">设计目标</div>
+                        <div class="objective-item">覆盖所有城市区块</div>
+                        <div class="objective-item">连接主要交通枢纽</div>
+                        <div class="objective-item">最小化轨道长度</div>
+                        <div class="objective-item">确保站点分布均匀</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果模态框 -->
+    <div class="result-modal" id="result-modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modal-title">设计结果</h2>
+            <div class="modal-stats">
+                <div class="stat-item correct-stat">
+                    <span class="stat-value" id="correct-count">0</span>
+                    <span class="stat-label">达成目标</span>
+                </div>
+                <div class="stat-item wrong-stat">
+                    <span class="stat-value" id="wrong-count">0</span>
+                    <span class="stat-label">未达成</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="total-count">0</span>
+                    <span class="stat-label">总目标</span>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="control-btn" onclick="closeModal()">关闭</button>
+                <button class="control-btn primary" onclick="resetGame()">重新设计</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // 真实城市地理环境数据
+    const cityData = {
+        beijing: {
+            name: '北京',
+            description: '首都，平原地形，城市呈同心圆结构',
+            blocks: [
+                { id: 'block1', name: '中心城区', x: '45%', y: '45%', width: 150, height: 120 },
+                { id: 'block2', name: '海淀区', x: '30%', y: '30%', width: 120, height: 100 },
+                { id: 'block3', name: '朝阳区', x: '60%', y: '30%', width: 120, height: 100 },
+                { id: 'block4', name: '丰台区', x: '45%', y: '60%', width: 120, height: 100 },
+                { id: 'block5', name: '通州区', x: '70%', y: '50%', width: 120, height: 100 },
+                { id: 'block6', name: '昌平区', x: '30%', y: '60%', width: 120, height: 100 },
+                { id: 'block7', name: '顺义区', x: '50%', y: '20%', width: 100, height: 80 },
+                { id: 'block8', name: '大兴区', x: '50%', y: '75%', width: 100, height: 80 }
+            ],
+            terrain: [
+                { type: 'river', name: '永定河', x1: '10%', y1: '80%', x2: '90%', y2: '80%' },
+                { type: 'park', name: '颐和园', x: '25%', y: '25%', width: 80, height: 60 },
+                { type: 'park', name: '故宫', x: '45%', y: '40%', width: 60, height: 80 },
+                { type: 'park', name: '天坛', x: '55%', y: '50%', width: 60, height: 60 },
+                { type: 'park', name: '八达岭长城', x: '10%', y: '10%', width: 80, height: 60 }
+            ],
+            landmarks: [
+                { type: 'government', name: '天安门', x: '45%', y: '45%' },
+                { type: 'commercial', name: '王府井', x: '48%', y: '42%' },
+                { type: 'commercial', name: '中关村', x: '32%', y: '32%' },
+                { type: 'commercial', name: 'CBD', x: '62%', y: '32%' },
+                { type: 'industry', name: '亦庄开发区', x: '65%', y: '65%' },
+                { type: 'scenic', name: '长城', x: '15%', y: '15%' },
+                { type: 'scenic', name: '颐和园', x: '25%', y: '25%' },
+                { type: 'scenic', name: '故宫', x: '45%', y: '40%' },
+                { type: 'scenic', name: '天坛', x: '55%', y: '50%' }
+            ]
+        },
+        shanghai: {
+            name: '上海',
+            description: '沿海城市，长江三角洲，地形平坦',
+            blocks: [
+                { id: 'block1', name: '黄浦区', x: '40%', y: '30%', width: 100, height: 80 },
+                { id: 'block2', name: '浦东新区', x: '60%', y: '40%', width: 150, height: 120 },
+                { id: 'block3', name: '静安区', x: '30%', y: '40%', width: 100, height: 80 },
+                { id: 'block4', name: '徐汇区', x: '35%', y: '50%', width: 100, height: 80 },
+                { id: 'block5', name: '长宁区', x: '25%', y: '35%', width: 90, height: 70 },
+                { id: 'block6', name: '普陀区', x: '25%', y: '50%', width: 90, height: 70 },
+                { id: 'block7', name: '虹口区', x: '45%', y: '25%', width: 90, height: 70 },
+                { id: 'block8', name: '杨浦区', x: '55%', y: '25%', width: 90, height: 70 },
+                { id: 'block9', name: '宝山区', x: '35%', y: '15%', width: 100, height: 80 },
+                { id: 'block10', name: '闵行区', x: '30%', y: '65%', width: 120, height: 90 }
+            ],
+            terrain: [
+                { type: 'river', name: '黄浦江', x1: '30%', y1: '20%', x2: '70%', y2: '60%' },
+                { type: 'coast', name: '东海', x1: '80%', y1: '10%', x2: '80%', y2: '90%' },
+                { type: 'park', name: '外滩', x: '40%', y: '25%', width: 80, height: 60 },
+                { type: 'park', name: '东方明珠', x: '55%', y: '35%', width: 60, height: 60 }
+            ],
+            landmarks: [
+                { type: 'government', name: '上海市政府', x: '35%', y: '35%' },
+                { type: 'commercial', name: '南京路', x: '35%', y: '30%' },
+                { type: 'commercial', name: '陆家嘴', x: '55%', y: '35%' },
+                { type: 'commercial', name: '徐家汇', x: '35%', y: '50%' },
+                { type: 'industry', name: '张江高科技园区', x: '65%', y: '25%' },
+                { type: 'scenic', name: '外滩', x: '40%', y: '25%' },
+                { type: 'scenic', name: '东方明珠', x: '55%', y: '35%' },
+                { type: 'scenic', name: '豫园', x: '42%', y: '32%' },
+                { type: 'scenic', name: '迪士尼', x: '75%', y: '65%' }
+            ]
+        },
+        guangzhou: {
+            name: '广州',
+            description: '华南中心城市，珠江三角洲，水网密布',
+            blocks: [
+                { id: 'block1', name: '越秀区', x: '40%', y: '40%', width: 100, height: 80 },
+                { id: 'block2', name: '天河区', x: '55%', y: '35%', width: 120, height: 90 },
+                { id: 'block3', name: '海珠区', x: '45%', y: '55%', width: 100, height: 80 },
+                { id: 'block4', name: '荔湾区', x: '30%', y: '45%', width: 90, height: 70 },
+                { id: 'block5', name: '白云区', x: '30%', y: '25%', width: 120, height: 90 },
+                { id: 'block6', name: '黄埔区', x: '65%', y: '25%', width: 100, height: 80 },
+                { id: 'block7', name: '番禺区', x: '50%', y: '70%', width: 120, height: 90 }
+            ],
+            terrain: [
+                { type: 'river', name: '珠江', x1: '20%', y1: '60%', x2: '70%', y2: '30%' },
+                { type: 'park', name: '广州塔', x: '50%', y: '45%', width: 60, height: 60 }
+            ],
+            landmarks: [
+                { type: 'government', name: '广州市政府', x: '40%', y: '40%' },
+                { type: 'commercial', name: '北京路', x: '42%', y: '42%' },
+                { type: 'commercial', name: '天河城', x: '55%', y: '35%' },
+                { type: 'commercial', name: '上下九', x: '32%', y: '45%' },
+                { type: 'industry', name: '广州开发区', x: '65%', y: '25%' },
+                { type: 'scenic', name: '广州塔', x: '50%', y: '45%' },
+                { type: 'scenic', name: '陈家祠', x: '32%', y: '45%' },
+                { type: 'scenic', name: '白云山', x: '25%', y: '20%' },
+                { type: 'scenic', name: '长隆', x: '60%', y: '65%' }
+            ]
+        },
+        chengdu: {
+            name: '成都',
+            description: '西南中心城市，成都平原，地势平坦',
+            blocks: [
+                { id: 'block1', name: '锦江区', x: '45%', y: '40%', width: 100, height: 80 },
+                { id: 'block2', name: '青羊区', x: '35%', y: '40%', width: 100, height: 80 },
+                { id: 'block3', name: '金牛区', x: '30%', y: '50%', width: 100, height: 80 },
+                { id: 'block4', name: '武侯区', x: '45%', y: '55%', width: 100, height: 80 },
+                { id: 'block5', name: '成华区', x: '55%', y: '45%', width: 100, height: 80 },
+                { id: 'block6', name: '高新区', x: '50%', y: '65%', width: 120, height: 90 },
+                { id: 'block7', name: '龙泉驿区', x: '65%', y: '35%', width: 100, height: 80 }
+            ],
+            terrain: [
+                { type: 'river', name: '锦江', x1: '30%', y1: '30%', x2: '70%', y2: '60%' },
+                { type: 'mountain', name: '龙泉山', x: '80%', y: '40%', width: 60, height: 100 },
+                { type: 'park', name: '武侯祠', x: '40%', y: '45%', width: 60, height: 60 }
+            ],
+            landmarks: [
+                { type: 'government', name: '成都市政府', x: '45%', y: '40%' },
+                { type: 'commercial', name: '春熙路', x: '45%', y: '40%' },
+                { type: 'commercial', name: '太古里', x: '47%', y: '42%' },
+                { type: 'commercial', name: 'IFS', x: '47%', y: '40%' },
+                { type: 'industry', name: '成都高新区', x: '50%', y: '65%' },
+                { type: 'scenic', name: '武侯祠', x: '40%', y: '45%' },
+                { type: 'scenic', name: '宽窄巷子', x: '35%', y: '35%' },
+                { type: 'scenic', name: '大熊猫基地', x: '70%', y: '25%' },
+                { type: 'scenic', name: '都江堰', x: '15%', y: '15%' }
+            ]
+        },
+        lanzhou: {
+            name: '兰州',
+            description: '西北城市，沿黄河分布，地形狭长',
+            blocks: [
+                { id: 'block1', name: '城关区', x: '45%', y: '40%', width: 150, height: 80 },
+                { id: 'block2', name: '七里河区', x: '45%', y: '60%', width: 150, height: 80 },
+                { id: 'block3', name: '西固区', x: '25%', y: '50%', width: 100, height: 80 },
+                { id: 'block4', name: '安宁区', x: '65%', y: '50%', width: 100, height: 80 }
+            ],
+            terrain: [
+                { type: 'river', name: '黄河', x1: '10%', y1: '50%', x2: '90%', y2: '50%' },
+                { type: 'mountain', name: '皋兰山', x: '90%', y: '30%', width: 80, height: 120 },
+                { type: 'mountain', name: '九州台', x: '10%', y: '70%', width: 80, height: 120 },
+                { type: 'park', name: '中山桥', x: '45%', y: '50%', width: 60, height: 60 }
+            ],
+            landmarks: [
+                { type: 'government', name: '兰州市政府', x: '45%', y: '40%' },
+                { type: 'commercial', name: '东方红广场', x: '45%', y: '40%' },
+                { type: 'commercial', name: '张掖路', x: '43%', y: '42%' },
+                { type: 'industry', name: '兰州新区', x: '80%', y: '50%' },
+                { type: 'scenic', name: '中山桥', x: '45%', y: '50%' },
+                { type: 'scenic', name: '白塔山', x: '40%', y: '45%' },
+                { type: 'scenic', name: '五泉山', x: '50%', y: '35%' }
+            ]
+        },
+        taiyuan: {
+            name: '太原',
+            description: '华北城市，汾河谷地，地形平坦',
+            blocks: [
+                { id: 'block1', name: '迎泽区', x: '45%', y: '40%', width: 120, height: 90 },
+                { id: 'block2', name: '杏花岭区', x: '45%', y: '25%', width: 120, height: 90 },
+                { id: 'block3', name: '万柏林区', x: '30%', y: '45%', width: 100, height: 80 },
+                { id: 'block4', name: '小店区', x: '60%', y: '45%', width: 100, height: 80 },
+                { id: 'block5', name: '尖草坪区', x: '45%', y: '15%', width: 100, height: 80 }
+            ],
+            terrain: [
+                { type: 'river', name: '汾河', x1: '20%', y1: '55%', x2: '70%', y2: '35%' },
+                { type: 'mountain', name: '西山', x: '15%', y: '50%', width: 60, height: 100 },
+                { type: 'mountain', name: '东山', x: '85%', y: '50%', width: 60, height: 100 },
+                { type: 'park', name: '晋祠', x: '25%', y: '60%', width: 60, height: 60 }
+            ],
+            landmarks: [
+                { type: 'government', name: '太原市政府', x: '45%', y: '40%' },
+                { type: 'commercial', name: '柳巷', x: '45%', y: '40%' },
+                { type: 'commercial', name: '长风街', x: '55%', y: '50%' },
+                { type: 'industry', name: '太原经济技术开发区', x: '65%', y: '55%' },
+                { type: 'scenic', name: '晋祠', x: '25%', y: '60%' },
+                { type: 'scenic', name: '天龙山', x: '20%', y: '65%' },
+                { type: 'scenic', name: '纯阳宫', x: '43%', y: '42%' }
+            ]
+        },
+        shenzhen: {
+            name: '深圳',
+            description: '特区城市，沿海，地形多山',
+            blocks: [
+                { id: 'block1', name: '福田区', x: '40%', y: '30%', width: 100, height: 80 },
+                { id: 'block2', name: '罗湖区', x: '30%', y: '25%', width: 90, height: 70 },
+                { id: 'block3', name: '南山区', x: '50%', y: '40%', width: 120, height: 90 },
+                { id: 'block4', name: '宝安区', x: '30%', y: '50%', width: 120, height: 90 },
+                { id: 'block5', name: '龙岗区', x: '60%', y: '50%', width: 120, height: 90 },
+                { id: 'block6', name: '盐田区', x: '20%', y: '15%', width: 80, height: 60 }
+            ],
+            terrain: [
+                { type: 'coast', name: '深圳湾', x1: '60%', y1: '10%', x2: '90%', y2: '40%' },
+                { type: 'mountain', name: '梧桐山', x: '10%', y: '10%', width: 80, height: 120 },
+                { type: 'mountain', name: '羊台山', x: '20%', y: '60%', width: 80, height: 120 },
+                { type: 'park', name: '世界之窗', x: '45%', y: '45%', width: 60, height: 60 }
+            ],
+            landmarks: [
+                { type: 'government', name: '深圳市政府', x: '40%', y: '30%' },
+                { type: 'commercial', name: '华强北', x: '35%', y: '35%' },
+                { type: 'commercial', name: '东门', x: '30%', y: '25%' },
+                { type: 'commercial', name: '科技园', x: '50%', y: '40%' },
+                { type: 'industry', name: '深圳高新区', x: '50%', y: '40%' },
+                { type: 'scenic', name: '世界之窗', x: '45%', y: '45%' },
+                { type: 'scenic', name: '东部华侨城', x: '20%', y: '15%' },
+                { type: 'scenic', name: '大梅沙', x: '15%', y: '10%' },
+                { type: 'scenic', name: '红树林', x: '55%', y: '35%' }
+            ]
+        },
+        hangzhou: {
+            name: '杭州',
+            description: '江南城市，西湖周边，水网密布',
+            blocks: [
+                { id: 'block1', name: '上城区', x: '40%', y: '35%', width: 100, height: 80 },
+                { id: 'block2', name: '下城区', x: '40%', y: '25%', width: 100, height: 80 },
+                { id: 'block3', name: '西湖区', x: '30%', y: '30%', width: 120, height: 90 },
+                { id: 'block4', name: '江干区', x: '50%', y: '30%', width: 100, height: 80 },
+                { id: 'block5', name: '余杭区', x: '30%', y: '50%', width: 120, height: 90 },
+                { id: 'block6', name: '萧山区', x: '50%', y: '50%', width: 120, height: 90 }
+            ],
+            terrain: [
+                { type: 'lake', name: '西湖', x: '25%', y: '25%', width: 100, height: 80 },
+                { type: 'river', name: '钱塘江', x1: '40%', y1: '60%', x2: '70%', y2: '40%' },
+                { type: 'park', name: '西湖景区', x: '30%', y: '30%', width: 80, height: 60 }
+            ],
+            landmarks: [
+                { type: 'government', name: '杭州市政府', x: '40%', y: '35%' },
+                { type: 'commercial', name: '湖滨银泰', x: '40%', y: '35%' },
+                { type: 'commercial', name: '钱江新城', x: '55%', y: '40%' },
+                { type: 'industry', name: '杭州高新区', x: '50%', y: '50%' },
+                { type: 'scenic', name: '西湖', x: '30%', y: '30%' },
+                { type: 'scenic', name: '灵隐寺', x: '25%', y: '20%' },
+                { type: 'scenic', name: '千岛湖', x: '10%', y: '10%' },
+                { type: 'scenic', name: '宋城', x: '45%', y: '55%' }
+            ]
+        }
+    };
+    
+    // 当前城市
+    let currentCity = 'beijing';
+    
+    // 游戏状态
+    let gameState = {
+        stations: [],
+        tracks: [],
+        currentTool: 'station',
+        currentTrackType: 'metro',
+        selectedStation: null,
+        isDrawingTrack: false,
+        trackStart: null
+    };
+    
+    // DOM元素
+    const cityMap = document.getElementById('city-map');
+    const stationCountElement = document.getElementById('station-count');
+    const trackLengthElement = document.getElementById('track-length');
+    const coverageElement = document.getElementById('coverage');
+    const resultModal = document.getElementById('result-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const correctCountElement = document.getElementById('correct-count');
+    const wrongCountElement = document.getElementById('wrong-count');
+    const totalCountElement = document.getElementById('total-count');
+    
+    // 初始化
+    function init() {
+        // 添加工具按钮事件
+        document.querySelectorAll('.tool-button[data-tool]').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tool-button[data-tool]').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                gameState.currentTool = button.dataset.tool;
+            });
+        });
+        
+        // 添加轨道类型按钮事件
+        document.querySelectorAll('.tool-button[data-track]').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tool-button[data-track]').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                gameState.currentTrackType = button.dataset.track;
+            });
+        });
+        
+        // 初始化游戏
+        resetGame();
+        
+        // 延迟加载地图，确保DOM完全加载
+        setTimeout(() => {
+            loadCityData(currentCity);
+            initMapEvents();
+        }, 100);
+    }
+    
+    // 城市中心点坐标（WGS84坐标系）
+    const cityCenterCoords = {
+        beijing: [39.915, 116.404],      // 北京
+        shanghai: [31.231, 121.474],     // 上海
+        guangzhou: [23.129, 113.264],    // 广州
+        chengdu: [30.573, 104.066],      // 成都
+        lanzhou: [36.061, 103.834],       // 兰州
+        taiyuan: [37.870, 112.562],       // 太原
+        shenzhen: [22.543, 114.057],      // 深圳
+        hangzhou: [30.274, 120.155]       // 杭州
+    };
+    
+    let map = null;
+    let markers = [];
+    
+    // 加载城市数据
+    function loadCityData(cityId) {
+        // 清空地图
+        cityMap.innerHTML = '';
+        
+        const city = cityData[cityId];
+        if (!city) return;
+        
+        // 初始化Leaflet地图
+        initMap(cityId);
+    }
+    
+    // 初始化地图
+    function initMap(cityId) {
+        console.log('初始化地图:', cityId);
+        
+        // 检查城市地图容器
+        const mapContainer = document.getElementById('city-map');
+        if (!mapContainer) {
+            console.error('地图容器未找到');
+            return;
+        }
+        
+        console.log('地图容器尺寸:', mapContainer.offsetWidth, 'x', mapContainer.offsetHeight);
+        
+        // 清除现有地图
+        if (map) {
+            map.remove();
+            map = null;
+        }
+        
+        // 清除现有标记
+        markers = [];
+        
+        // 获取城市中心点
+        const center = cityCenterCoords[cityId];
+        if (!center) {
+            console.error('城市坐标未找到:', cityId);
+            return;
+        }
+        
+        console.log('城市中心点:', center);
+        
+        try {
+            // 创建地图
+            map = L.map('city-map').setView(center, 12);
+            
+            // 添加ArcGIS World Imagery图层
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri',
+                maxZoom: 19
+            }).addTo(map);
+            
+            // 添加街道标注图层
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '',
+                maxZoom: 19
+            }).addTo(map);
+            
+            console.log('地图初始化成功');
+            
+            // 添加地标标记
+            const city = cityData[cityId];
+            if (city && city.landmarks) {
+                console.log('添加地标标记:', city.landmarks.length);
+                city.landmarks.forEach(landmark => {
+                    addLandmarkMarker(landmark, cityId);
+                });
+            }
+            
+            // 调整地图大小
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize();
+                    console.log('地图大小调整完成');
+                }
+            }, 500);
+            
+        } catch (error) {
+            console.error('地图初始化失败:', error);
+            //  fallback到静态地图
+            fallbackToStaticMap(cityId);
+        }
+    }
+    
+    // 静态地图fallback
+    function fallbackToStaticMap(cityId) {
+        console.log('使用静态地图 fallback');
+        const cityMapImages = {
+            beijing: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Beijing%20city%20map%20satellite%20view%20realistic&image_size=landscape_16_9',
+            shanghai: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Shanghai%20city%20map%20satellite%20view%20realistic&image_size=landscape_16_9',
+            guangzhou: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Guangzhou%20city%20map%20satellite%20view%20realistic&image_size=landscape_16_9',
+            chengdu: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chengdu%20city%20map%20satellite%20view%20realistic&image_size=landscape_16_9',
+            lanzhou: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Lanzhou%20city%20map%20satellite%20view%20realistic&image_size=landscape_16_9',
+            taiyuan: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Taiyuan%20city%20map%20satellite%20view%20realistic&image_size=landscape_16_9',
+            shenzhen: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Shenzhen%20city%20map%20satellite%20view%20realistic&image_size=landscape_16_9',
+            hangzhou: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Hangzhou%20city%20map%20satellite%20view%20realistic&image_size=landscape_16_9'
+        };
+        
+        const cityMap = document.getElementById('city-map');
+        if (cityMap) {
+            cityMap.style.backgroundImage = `url('${cityMapImages[cityId]}')`;
+            cityMap.style.backgroundSize = 'cover';
+            cityMap.style.backgroundPosition = 'center';
+        }
+    }
+    
+    // 添加地标标记
+    function addLandmarkMarker(landmark, cityId) {
+        // 这里简化处理，使用城市中心点附近的随机位置
+        // 实际应用中应该使用真实的地标坐标
+        const center = cityCenterCoords[cityId];
+        if (!center) return;
+        
+        // 根据地标类型设置图标
+        let iconText = '📍';
+        let color = '#95a5a6';
+        
+        switch (landmark.type) {
+            case 'government':
+                iconText = '🏛️';
+                color = '#3498db';
+                break;
+            case 'commercial':
+                iconText = '🏬';
+                color = '#e74c3c';
+                break;
+            case 'industry':
+                iconText = '🏭';
+                color = '#f39c12';
+                break;
+            case 'scenic':
+                iconText = '🏞️';
+                color = '#27ae60';
+                break;
+        }
+        
+        // 生成随机偏移，使标记分散在地图上
+        const offsetX = (Math.random() - 0.5) * 0.01;
+        const offsetY = (Math.random() - 0.5) * 0.01;
+        
+        // 创建标记位置
+        const latlng = L.latLng(center[0] + offsetX, center[1] + offsetY);
+        
+        // 创建自定义HTML图标
+        const iconHtml = `<div style="background: ${color}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${iconText}</div>`;
+        
+        // 创建自定义图标
+        const icon = L.divIcon({
+            html: iconHtml,
+            className: 'custom-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        
+        // 创建标记
+        const marker = L.marker(latlng, { icon: icon })
+            .addTo(map)
+            .bindPopup(landmark.name);
+        
+        markers.push(marker);
+    }
+    
+    // 创建地标元素
+    function createLandmarkElement(landmark) {
+        const landmarkElement = document.createElement('div');
+        landmarkElement.className = 'landmark ' + landmark.type;
+        landmarkElement.style.position = 'absolute';
+        landmarkElement.style.left = landmark.x;
+        landmarkElement.style.top = landmark.y;
+        landmarkElement.style.width = '30px';
+        landmarkElement.style.height = '30px';
+        landmarkElement.style.borderRadius = '50%';
+        landmarkElement.style.display = 'flex';
+        landmarkElement.style.alignItems = 'center';
+        landmarkElement.style.justifyContent = 'center';
+        landmarkElement.style.color = 'white';
+        landmarkElement.style.fontSize = '12px';
+        landmarkElement.style.fontWeight = 'bold';
+        landmarkElement.style.zIndex = '100';
+        landmarkElement.style.cursor = 'pointer';
+        landmarkElement.style.transition = 'transform 0.3s ease';
+        
+        // 根据地标类型设置颜色
+        switch (landmark.type) {
+            case 'government':
+                landmarkElement.style.background = '#3498db'; // 蓝色
+                landmarkElement.innerHTML = '🏛️';
+                break;
+            case 'commercial':
+                landmarkElement.style.background = '#e74c3c'; // 红色
+                landmarkElement.innerHTML = '🏬';
+                break;
+            case 'industry':
+                landmarkElement.style.background = '#f39c12'; // 橙色
+                landmarkElement.innerHTML = '🏭';
+                break;
+            case 'scenic':
+                landmarkElement.style.background = '#27ae60'; // 绿色
+                landmarkElement.innerHTML = '🏞️';
+                break;
+            default:
+                landmarkElement.style.background = '#95a5a6'; // 灰色
+                landmarkElement.innerHTML = '📍';
+        }
+        
+        // 添加悬停效果
+        landmarkElement.addEventListener('mouseover', function() {
+            this.style.transform = 'scale(1.2)';
+            this.title = landmark.name;
+        });
+        
+        landmarkElement.addEventListener('mouseout', function() {
+            this.style.transform = 'scale(1)';
+        });
+        
+        cityMap.appendChild(landmarkElement);
+    }
+    
+    // 创建地形元素
+    function createTerrainElement(terrain) {
+        if (terrain.type === 'river' || terrain.type === 'coast') {
+            // 创建河流或海岸线
+            const terrainElement = document.createElement('div');
+            terrainElement.className = 'terrain ' + terrain.type;
+            terrainElement.style.position = 'absolute';
+            terrainElement.style.background = terrain.type === 'river' ? '#3498db' : '#1e88e5';
+            terrainElement.style.opacity = '0.3';
+            
+            if (terrain.type === 'river') {
+                // 河流
+                const length = Math.sqrt(Math.pow(parseInt(terrain.x2) - parseInt(terrain.x1), 2) + Math.pow(parseInt(terrain.y2) - parseInt(terrain.y1), 2));
+                const angle = Math.atan2(parseInt(terrain.y2) - parseInt(terrain.y1), parseInt(terrain.x2) - parseInt(terrain.x1)) * 180 / Math.PI;
+                
+                terrainElement.style.width = length + 'px';
+                terrainElement.style.height = '30px';
+                terrainElement.style.left = terrain.x1;
+                terrainElement.style.top = terrain.y1;
+                terrainElement.style.transform = `rotate(${angle}deg)`;
+                terrainElement.style.borderRadius = '15px';
+            } else {
+                // 海岸线
+                terrainElement.style.width = '20px';
+                terrainElement.style.height = '100%';
+                terrainElement.style.left = terrain.x1;
+                terrainElement.style.top = terrain.y1;
+            }
+            
+            cityMap.appendChild(terrainElement);
+        } else if (terrain.type === 'mountain') {
+            // 创建山脉
+            const terrainElement = document.createElement('div');
+            terrainElement.className = 'terrain mountain';
+            terrainElement.style.position = 'absolute';
+            terrainElement.style.background = 'linear-gradient(to bottom, #8d6e63, #a1887f)';
+            terrainElement.style.left = terrain.x;
+            terrainElement.style.top = terrain.y;
+            terrainElement.style.width = terrain.width + 'px';
+            terrainElement.style.height = terrain.height + 'px';
+            terrainElement.style.borderRadius = '10px';
+            terrainElement.textContent = terrain.name;
+            terrainElement.style.display = 'flex';
+            terrainElement.style.alignItems = 'center';
+            terrainElement.style.justifyContent = 'center';
+            terrainElement.style.color = 'white';
+            terrainElement.style.fontSize = '12px';
+            terrainElement.style.fontWeight = 'bold';
+            cityMap.appendChild(terrainElement);
+        } else if (terrain.type === 'lake') {
+            // 创建湖泊
+            const terrainElement = document.createElement('div');
+            terrainElement.className = 'terrain lake';
+            terrainElement.style.position = 'absolute';
+            terrainElement.style.background = '#3498db';
+            terrainElement.style.opacity = '0.3';
+            terrainElement.style.left = terrain.x;
+            terrainElement.style.top = terrain.y;
+            terrainElement.style.width = terrain.width + 'px';
+            terrainElement.style.height = terrain.height + 'px';
+            terrainElement.style.borderRadius = '20px';
+            terrainElement.textContent = terrain.name;
+            terrainElement.style.display = 'flex';
+            terrainElement.style.alignItems = 'center';
+            terrainElement.style.justifyContent = 'center';
+            terrainElement.style.color = 'white';
+            terrainElement.style.fontSize = '12px';
+            terrainElement.style.fontWeight = 'bold';
+            cityMap.appendChild(terrainElement);
+        } else if (terrain.type === 'park') {
+            // 创建公园
+            const terrainElement = document.createElement('div');
+            terrainElement.className = 'terrain park';
+            terrainElement.style.position = 'absolute';
+            terrainElement.style.background = 'linear-gradient(to bottom, #4caf50, #81c784)';
+            terrainElement.style.opacity = '0.3';
+            terrainElement.style.left = terrain.x;
+            terrainElement.style.top = terrain.y;
+            terrainElement.style.width = terrain.width + 'px';
+            terrainElement.style.height = terrain.height + 'px';
+            terrainElement.style.borderRadius = '10px';
+            terrainElement.textContent = terrain.name;
+            terrainElement.style.display = 'flex';
+            terrainElement.style.alignItems = 'center';
+            terrainElement.style.justifyContent = 'center';
+            terrainElement.style.color = 'white';
+            terrainElement.style.fontSize = '12px';
+            terrainElement.style.fontWeight = 'bold';
+            cityMap.appendChild(terrainElement);
+        }
+    }
+    
+    // 切换城市
+    function changeCity(cityId) {
+        currentCity = cityId;
+        loadCityData(cityId);
+        resetGame();
+    }
+    
+    // 处理地图点击
+    function handleMapClick(e) {
+        // 获取点击位置相对于地图容器的坐标
+        const rect = cityMap.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        switch (gameState.currentTool) {
+            case 'station':
+                addStation(x, y);
+                break;
+            case 'track':
+                handleTrackDrawing(x, y);
+                break;
+            case 'erase':
+                eraseElement(x, y);
+                break;
+        }
+    }
+    
+    // 初始化地图事件
+    function initMapEvents() {
+        // 直接在地图容器上监听点击事件
+        cityMap.addEventListener('click', handleMapClick);
+    }
+    
+    // 添加站点
+    function addStation(x, y) {
+        const stationId = 'station' + (gameState.stations.length + 1);
+        const station = {
+            id: stationId,
+            x: x,
+            y: y,
+            name: '站点' + (gameState.stations.length + 1)
+        };
+        
+        gameState.stations.push(station);
+        
+        // 创建站点元素
+        const stationElement = document.createElement('div');
+        stationElement.className = 'station';
+        stationElement.id = stationId;
+        stationElement.style.left = (x - 15) + 'px';
+        stationElement.style.top = (y - 15) + 'px';
+        stationElement.textContent = gameState.stations.length;
+        stationElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectStation(stationId);
+        });
+        
+        cityMap.appendChild(stationElement);
+        updateGameInfo();
+    }
+    
+    // 选择站点
+    function selectStation(stationId) {
+        // 取消之前的选择
+        if (gameState.selectedStation) {
+            document.getElementById(gameState.selectedStation).classList.remove('selected');
+        }
+        
+        // 选择新站点
+        gameState.selectedStation = stationId;
+        document.getElementById(stationId).classList.add('selected');
+    }
+    
+    // 处理轨道绘制
+    function handleTrackDrawing(x, y) {
+        if (!gameState.isDrawingTrack) {
+            // 开始绘制轨道
+            gameState.isDrawingTrack = true;
+            gameState.trackStart = { x, y };
+        } else {
+            // 结束绘制轨道
+            const trackId = 'track' + (gameState.tracks.length + 1);
+            const track = {
+                id: trackId,
+                startX: gameState.trackStart.x,
+                startY: gameState.trackStart.y,
+                endX: x,
+                endY: y,
+                type: gameState.currentTrackType
+            };
+            
+            gameState.tracks.push(track);
+            
+            // 创建轨道元素
+            createTrackElement(track);
+            
+            gameState.isDrawingTrack = false;
+            gameState.trackStart = null;
+            updateGameInfo();
+        }
+    }
+    
+    // 创建轨道元素
+    function createTrackElement(track) {
+        const trackElement = document.createElement('div');
+        trackElement.className = 'track';
+        trackElement.id = track.id;
+        
+        // 计算轨道长度和角度
+        const length = Math.sqrt(Math.pow(track.endX - track.startX, 2) + Math.pow(track.endY - track.startY, 2));
+        const angle = Math.atan2(track.endY - track.startY, track.endX - track.startX) * 180 / Math.PI;
+        
+        // 设置轨道样式
+        trackElement.style.width = length + 'px';
+        trackElement.style.left = track.startX + 'px';
+        trackElement.style.top = track.startY + 'px';
+        trackElement.style.transform = `rotate(${angle}deg)`;
+        
+        cityMap.appendChild(trackElement);
+    }
+    
+    // 删除元素
+    function eraseElement(x, y) {
+        // 检查是否点击了站点
+        const stations = document.querySelectorAll('.station');
+        for (const station of stations) {
+            const rect = station.getBoundingClientRect();
+            const stationX = rect.left + rect.width / 2;
+            const stationY = rect.top + rect.height / 2;
+            const distance = Math.sqrt(Math.pow(x - stationX, 2) + Math.pow(y - stationY, 2));
+            
+            if (distance < 20) {
+                // 删除站点
+                const stationId = station.id;
+                gameState.stations = gameState.stations.filter(s => s.id !== stationId);
+                station.remove();
+                updateGameInfo();
+                return;
+            }
+        }
+        
+        // 检查是否点击了轨道
+        const tracks = document.querySelectorAll('.track');
+        for (const track of tracks) {
+            // 简化的轨道点击检测
+            if (track.getBoundingClientRect().contains({ x, y })) {
+                const trackId = track.id;
+                gameState.tracks = gameState.tracks.filter(t => t.id !== trackId);
+                track.remove();
+                updateGameInfo();
+                return;
+            }
+        }
+    }
+    
+    // 更新游戏信息
+    function updateGameInfo() {
+        // 更新站点数量
+        stationCountElement.textContent = gameState.stations.length;
+        
+        // 计算轨道长度
+        let totalLength = 0;
+        gameState.tracks.forEach(track => {
+            const length = Math.sqrt(Math.pow(track.endX - track.startX, 2) + Math.pow(track.endY - track.startY, 2));
+            totalLength += length;
+        });
+        trackLengthElement.textContent = Math.round(totalLength) + 'm';
+        
+        // 计算覆盖区域
+        const city = cityData[currentCity];
+        const blockCount = city ? city.blocks.length : 0;
+        const coverage = blockCount > 0 ? Math.min(100, Math.round((gameState.stations.length / blockCount) * 100)) : 0;
+        coverageElement.textContent = coverage + '%';
+    }
+    
+    // 检查设计
+    function checkDesign() {
+        let correct = 0;
+        let total = 4; // 总目标数
+        
+        const city = cityData[currentCity];
+        const blockCount = city ? city.blocks.length : 0;
+        
+        // 检查是否覆盖所有城市区块
+        if (gameState.stations.length >= blockCount) {
+            correct++;
+        }
+        
+        // 检查是否有轨道连接
+        if (gameState.tracks.length > 0) {
+            correct++;
+        }
+        
+        // 检查轨道长度是否合理
+        let totalLength = 0;
+        gameState.tracks.forEach(track => {
+            const length = Math.sqrt(Math.pow(track.endX - track.startX, 2) + Math.pow(track.endY - track.startY, 2));
+            totalLength += length;
+        });
+        if (totalLength > 0 && totalLength < 1500) {
+            correct++;
+        }
+        
+        // 检查站点分布
+        if (gameState.stations.length >= Math.max(3, Math.floor(blockCount * 0.7))) {
+            correct++;
+        }
+        
+        // 更新模态框
+        correctCountElement.textContent = correct;
+        wrongCountElement.textContent = total - correct;
+        totalCountElement.textContent = total;
+        
+        if (correct === total) {
+            modalTitle.textContent = '设计成功！';
+        } else {
+            modalTitle.textContent = '设计结果';
+        }
+        
+        // 显示模态框
+        resultModal.style.display = 'flex';
+    }
+    
+    // 重置游戏
+    function resetGame() {
+        // 清空站点和轨道
+        gameState.stations = [];
+        gameState.tracks = [];
+        gameState.selectedStation = null;
+        gameState.isDrawingTrack = false;
+        gameState.trackStart = null;
+        
+        // 清空DOM元素
+        document.querySelectorAll('.station').forEach(station => station.remove());
+        document.querySelectorAll('.track').forEach(track => track.remove());
+        
+        // 更新游戏信息
+        updateGameInfo();
+        closeModal();
+    }
+    
+    // 关闭模态框
+    function closeModal() {
+        resultModal.style.display = 'none';
+    }
+    
+    // 初始化应用
+    init();
+    </script>
+</body>
+</html>
